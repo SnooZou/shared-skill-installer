@@ -4,7 +4,13 @@
 
 A reusable shared-skill installer template. It keeps the full source of a GitHub or local skill in one shared library, then exposes it to multiple local AI clients through symlinks.
 
-## 下载 / Download
+---
+
+## 📥 下载 / Download
+
+这一节告诉新用户去哪里下载、怎么直接拿到仓库。
+
+This section tells new users where to download the project and how to get the repository quickly.
 
 - GitHub 仓库 / Repository: [https://github.com/SnooZou/shared-skill-installer](https://github.com/SnooZou/shared-skill-installer)
 - Git 克隆 / Clone:
@@ -15,7 +21,13 @@ git clone https://github.com/SnooZou/shared-skill-installer.git
 
 - ZIP 下载 / Download ZIP: [https://github.com/SnooZou/shared-skill-installer/archive/refs/heads/main.zip](https://github.com/SnooZou/shared-skill-installer/archive/refs/heads/main.zip)
 
-## 它解决什么问题 / What It Solves
+---
+
+## ✨ 它解决什么问题 / What It Solves
+
+这一节帮助读者先理解“为什么要用它”，再往下看安装和使用方法。
+
+This section helps readers understand why the project exists before they move into setup and usage.
 
 - 只保留一份共享源码库，避免同一个 skill 在多个智能体目录里重复安装
 - 新 skill 默认完整入库，不做删减，尽量保留原始源码结构
@@ -29,7 +41,13 @@ git clone https://github.com/SnooZou/shared-skill-installer.git
 - Shares the same skill with Codex, WorkBuddy, TRAE, and future local clients
 - Rebuilds all client links with one refresh command
 
-## 默认目录 / Default Layout
+---
+
+## 🗂️ 默认目录 / Default Layout
+
+这一节说明共享库默认会放在哪里，以及它会管理哪些核心文件。
+
+This section explains where the shared library lives by default and which core files it manages.
 
 默认共享库位置 / Default shared library root:
 
@@ -61,7 +79,13 @@ trae	${HOME}/.trae/skills
 
 - [`state/client-roots.tsv`](./state/client-roots.tsv)
 
-## 新用户首次安装 / First-Time Setup
+---
+
+## 🚀 新用户首次安装 / First-Time Setup
+
+这一节是第一次上手的主流程，按顺序做完就能把共享 skill 机制跑起来。
+
+This is the main first-run workflow. Follow it in order to get the shared skill system working.
 
 ### 第 1 步：下载仓库 / Step 1: Get the repository
 
@@ -100,7 +124,13 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 
 Restart Codex, WorkBuddy, TRAE, or any other configured client if they do not hot-reload skills.
 
-## 首次在智能体里怎么调用 / First Prompts To Use In Your AI Client
+---
+
+## 💬 首次在智能体里怎么调用 / First Prompts To Use In Your AI Client
+
+这一节专门解决“装好以后第一句该怎么说”，并展示不同智能体之间的调用差异。
+
+This section focuses on what to say after setup and shows the small invocation differences between clients.
 
 下面这些话可以直接复制给智能体。  
 You can paste these directly into your AI client.
@@ -177,7 +207,13 @@ Use $shared-skill-installer to import this multi-skill repository into the share
 Use $shared-skill-installer to add a new local client and rebuild every shared skill link: client=my-client, root=~/.my-client/skills
 ```
 
-## 安装完成后，如何继续安装新的开源 Skill / After Setup: How To Install New Open-Source Skills
+---
+
+## 📦 安装完成后，如何继续安装新的开源 Skill / After Setup: How To Install New Open-Source Skills
+
+这一节回答最核心的后续问题：共享机制装好之后，今后新的开源 skill 该怎么继续装。
+
+This section answers the main follow-up question: once the shared setup is ready, how do you keep installing new open-source skills?
 
 是的，这个项目的目标之一，就是让你在完成首次安装后，后续都通过同一个共享 skill 来安装新的开源 skill。
 
@@ -264,7 +300,13 @@ For every future skill, follow this rule:
 - First store the full source in `~/AI-skills`
 - Then expose it to each local AI client through links
 
-## 常用命令 / Common Commands
+---
+
+## 🛠️ 常用命令 / Common Commands
+
+这一节适合已经理解流程、只想快速找到命令的人。
+
+This section is for readers who already understand the workflow and just want the right command quickly.
 
 ### 安装单个本地 skill / Install a single local skill
 
@@ -315,7 +357,13 @@ For every future skill, follow this rule:
 ./scripts/verify-shared-links.sh shared-skill-installer
 ```
 
-## 新增本地智能体客户端 / Adding Another Local AI Client
+---
+
+## ➕ 新增本地智能体客户端 / Adding Another Local AI Client
+
+这一节讲的是如何把新的本地智能体也接进同一个共享 skill 体系。
+
+This section explains how to connect another local AI client to the same shared skill system.
 
 1. 编辑 / Edit [`state/client-roots.tsv`](./state/client-roots.tsv)
 2. 新增一行 / Add one line:
@@ -330,7 +378,13 @@ my-client	${HOME}/.my-client/skills
 ./scripts/install-shared-skill --refresh-links
 ```
 
-## 推荐流程固化 / Recommended Ongoing Workflow
+---
+
+## ✅ 推荐流程固化 / Recommended Ongoing Workflow
+
+这一节把长期使用时最推荐的操作规则固定下来，避免后续又装回分散目录。
+
+This section locks in the recommended long-term workflow so future installs do not drift back into scattered client folders.
 
 以后新 skill 推荐统一按下面流程处理：
 
@@ -343,7 +397,13 @@ For future skills, the recommended workflow is:
 3. 新增客户端时，只改 `client-roots.tsv` 并执行一次 `--refresh-links`  
    When you add another client, update `client-roots.tsv` and run `--refresh-links`.
 
-## 教程截图 / Tutorial Screenshots
+---
+
+## 🖼️ 教程截图 / Tutorial Screenshots
+
+这一节放的是教程示意图，帮助新用户通过视觉方式快速理解操作流程。
+
+This section contains tutorial screenshots so new users can understand the workflow visually.
 
 ### 1. 总览 / Overview
 
@@ -365,13 +425,25 @@ For future skills, the recommended workflow is:
 
 ![verify](./docs/screenshots/tutorial-05-verify.png)
 
-## 重新生成教程截图 / Regenerate The Docs Screenshots
+---
+
+## 🔄 重新生成教程截图 / Regenerate The Docs Screenshots
+
+如果你调整了文档示例或想更新示意图，可以用这一节里的命令重新生成截图。
+
+If you update the docs examples or want to refresh the tutorial visuals, use this command to regenerate the screenshots.
 
 ```bash
 ./scripts/regenerate-docs.sh
 ```
 
-## 仓库内容 / Repository Contents
+---
+
+## 📚 仓库内容 / Repository Contents
+
+这一节给维护者一个总览，方便快速找到脚本、状态文件和文档资源。
+
+This section gives maintainers a quick map of the repository so they can find scripts, state files, and docs assets fast.
 
 ```text
 shared-skill-installer/
