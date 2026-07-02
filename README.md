@@ -1,26 +1,43 @@
 # shared-skill-installer
 
-Install local or open-source skills into one shared library, then expose them to multiple local AI clients through symlinks.
+一个可复用的共享 skill 安装器模板。它会把 GitHub 或本地 skill 完整放进一个共享库，再通过软链接分发给多个本地智能体客户端。
 
-This repository is a reusable template. It is no longer tied to one specific machine path.
+A reusable shared-skill installer template. It keeps the full source of a GitHub or local skill in one shared library, then exposes it to multiple local AI clients through symlinks.
 
-## What It Solves
+## 下载 / Download
 
-- keeps one shared source of truth for local skills
-- preserves full source trees instead of extracting only partial files
-- supports single-skill folders, multi-skill repositories, and GitHub skill paths
-- shares the same skill with multiple local AI clients such as Codex, WorkBuddy, and TRAE
-- lets you add a new local client later and rebuild all links with one command
+- GitHub 仓库 / Repository: [https://github.com/SnooZou/shared-skill-installer](https://github.com/SnooZou/shared-skill-installer)
+- Git 克隆 / Clone:
 
-## Default Layout
+```bash
+git clone https://github.com/SnooZou/shared-skill-installer.git
+```
 
-By default, after bootstrap the shared library lives at:
+- ZIP 下载 / Download ZIP: [https://github.com/SnooZou/shared-skill-installer/archive/refs/heads/main.zip](https://github.com/SnooZou/shared-skill-installer/archive/refs/heads/main.zip)
+
+## 它解决什么问题 / What It Solves
+
+- 只保留一份共享源码库，避免同一个 skill 在多个智能体目录里重复安装
+- 新 skill 默认完整入库，不做删减，尽量保留原始源码结构
+- 支持单个 skill 文件夹、多 skill 仓库、GitHub skill 路径
+- 一个 skill 可同时共享给 Codex、WorkBuddy、TRAE，以及后续新增的本地客户端
+- 新增客户端后，可一键重建全部 skill 入口
+
+- Keeps one shared source of truth for local skills
+- Preserves full source trees instead of trimming files during install
+- Supports single-skill folders, multi-skill repositories, and GitHub skill paths
+- Shares the same skill with Codex, WorkBuddy, TRAE, and future local clients
+- Rebuilds all client links with one refresh command
+
+## 默认目录 / Default Layout
+
+默认共享库位置 / Default shared library root:
 
 ```text
 ${HOME}/AI-skills
 ```
 
-The installer will manage:
+默认会管理这些路径 / By default the template manages:
 
 ```text
 ${HOME}/AI-skills/
@@ -32,11 +49,7 @@ ${HOME}/AI-skills/
 └── shared-skill-installer/
 ```
 
-Client roots are configured in:
-
-- [`state/client-roots.tsv`](./state/client-roots.tsv)
-
-Default template:
+默认客户端目录模板 / Default client roots template:
 
 ```text
 codex	${HOME}/.codex/skills
@@ -44,81 +57,111 @@ workbuddy	${HOME}/.workbuddy/skills
 trae	${HOME}/.trae/skills
 ```
 
-## Quick Start
+客户端配置文件 / Client config file:
 
-### 1. Clone this repository
+- [`state/client-roots.tsv`](./state/client-roots.tsv)
+
+## 新用户首次安装 / First-Time Setup
+
+### 第 1 步：下载仓库 / Step 1: Get the repository
 
 ```bash
 git clone https://github.com/SnooZou/shared-skill-installer.git
 cd shared-skill-installer
 ```
 
-### 2. Bootstrap the shared library
+### 第 2 步：初始化共享库 / Step 2: Bootstrap the shared library
 
 ```bash
 ./scripts/bootstrap.sh
 ```
 
-This will:
+这一步会 / This will:
 
-- create `${HOME}/AI-skills` if needed
-- install this repository into `${HOME}/AI-skills/shared-skill-installer`
-- copy the default client roots template into `${HOME}/AI-skills/.shared-skill-state/client-roots.tsv`
-- create the `shared-skill-installer` skill entry in every configured client root
+- 创建 `${HOME}/AI-skills`
+- 把本仓库安装到 `${HOME}/AI-skills/shared-skill-installer`
+- 写入 `${HOME}/AI-skills/.shared-skill-state/client-roots.tsv`
+- 给已配置客户端创建 `shared-skill-installer` 的软链接入口
 
-If you want another shared library location, set `SHARED_ROOT` first:
+- Create `${HOME}/AI-skills`
+- Install this repository into `${HOME}/AI-skills/shared-skill-installer`
+- Write `${HOME}/AI-skills/.shared-skill-state/client-roots.tsv`
+- Create the `shared-skill-installer` entry in each configured client root
+
+如果你想改共享库位置 / If you want a different shared root:
 
 ```bash
 SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 ```
 
-### 3. Restart your local AI clients
+### 第 3 步：重启本地智能体 / Step 3: Restart your local AI clients
 
-Restart Codex, WorkBuddy, TRAE, or any other configured client if they do not hot-reload new skills.
+如果 Codex、WorkBuddy、TRAE 没有自动刷新 skill，请重启一次。
 
-## How To Use The Skill
+Restart Codex, WorkBuddy, TRAE, or any other configured client if they do not hot-reload skills.
 
-### Natural-language invocation
+## 首次在智能体里怎么调用 / First Prompts To Use In Your AI Client
+
+下面这些话可以直接复制给智能体。  
+You can paste these directly into your AI client.
+
+### 中文口令 / Chinese prompts
 
 ```text
-Use shared-skill-installer to install this GitHub skill into my shared library: https://github.com/owner/repo/tree/main/path/to/skill
+请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用：https://github.com/owner/repo/tree/main/path/to/skill
 ```
 
 ```text
-Use shared-skill-installer to import this local skill into the shared library: /path/to/skill
+请使用 $shared-skill-installer，把这个本地 skill 完整入库到 AI-skills，并让 Codex、WorkBuddy、TRAE 共用：/path/to/skill
 ```
 
 ```text
-Use shared-skill-installer to add TRAE to my shared clients and refresh all links
+请使用 $shared-skill-installer，把这个多 skill 仓库完整导入共享库，容器名叫 open-design，并刷新所有客户端入口：/path/to/open-design
 ```
-
-### Skill syntax
 
 ```text
-Use $shared-skill-installer to install this local skill into the shared library: /path/to/skill
+请使用 $shared-skill-installer，把新的本地客户端加入共享列表并刷新全部 skill 入口：客户端名=my-client，目录=~/.my-client/skills
 ```
 
-## Common Commands
+### English prompts
 
-### Install a single local skill
+```text
+Use $shared-skill-installer to install this GitHub skill into my shared skill library and expose it to all local AI clients: https://github.com/owner/repo/tree/main/path/to/skill
+```
+
+```text
+Use $shared-skill-installer to import this local skill into AI-skills and share it with Codex, WorkBuddy, and TRAE: /path/to/skill
+```
+
+```text
+Use $shared-skill-installer to import this multi-skill repository into the shared library under the container name open-design, then refresh all client links: /path/to/open-design
+```
+
+```text
+Use $shared-skill-installer to add a new local client and rebuild every shared skill link: client=my-client, root=~/.my-client/skills
+```
+
+## 常用命令 / Common Commands
+
+### 安装单个本地 skill / Install a single local skill
 
 ```bash
 ./scripts/run-install.sh --local /path/to/skill-root
 ```
 
-### Move a single local skill into the shared library
+### 把本地 skill 移入共享库 / Move a local skill into the shared library
 
 ```bash
 ./scripts/run-install.sh --local /path/to/skill-root --move-local
 ```
 
-### Install from GitHub
+### 从 GitHub 安装 / Install from GitHub
 
 ```bash
 ./scripts/run-install.sh --repo owner/repo --path path/to/skill
 ```
 
-### Install a multi-skill repository
+### 导入多 skill 仓库 / Install a multi-skill repository
 
 ```bash
 ./scripts/run-install.sh \
@@ -127,68 +170,85 @@ Use $shared-skill-installer to install this local skill into the shared library:
   --map-file ./state/open-design.skillmap.tsv
 ```
 
-### Rebuild links for every configured client
+### 重建所有客户端软链接 / Rebuild links for every configured client
 
 ```bash
 ./scripts/install-shared-skill --refresh-links
 ```
 
-Use this after:
+适用场景 / Use this after:
+
+- 新增了一个客户端目录
+- 迁移到新机器
+- 本地客户端 skill 目录被清空或替换
 
 - adding a new client root
 - restoring a machine
 - replacing client-side skill folders
 
-### Verify one shared skill
+### 验证某个共享 skill / Verify one shared skill
 
 ```bash
 ./scripts/verify-shared-links.sh shared-skill-installer
 ```
 
-## Adding Another Local AI Client
+## 新增本地智能体客户端 / Adding Another Local AI Client
 
-1. Edit [`state/client-roots.tsv`](./state/client-roots.tsv)
-2. Add one line:
+1. 编辑 / Edit [`state/client-roots.tsv`](./state/client-roots.tsv)
+2. 新增一行 / Add one line:
 
 ```text
 my-client	${HOME}/.my-client/skills
 ```
 
-3. Re-run:
+3. 刷新全部入口 / Re-run:
 
 ```bash
 ./scripts/install-shared-skill --refresh-links
 ```
 
-## Screenshots
+## 推荐流程固化 / Recommended Ongoing Workflow
 
-### 1. Overview
+以后新 skill 推荐统一按下面流程处理：
+
+For future skills, the recommended workflow is:
+
+1. 先把 skill 的完整源码放进共享库，不要只抽取部分文件  
+   First keep the full source tree in the shared library instead of extracting only selected files.
+2. 再通过软链接分发给各个智能体客户端  
+   Then expose it to each local AI client through symlinks.
+3. 新增客户端时，只改 `client-roots.tsv` 并执行一次 `--refresh-links`  
+   When you add another client, update `client-roots.tsv` and run `--refresh-links`.
+
+## 教程截图 / Tutorial Screenshots
+
+### 1. 总览 / Overview
 
 ![overview](./docs/screenshots/tutorial-01-overview.png)
 
-### 2. Help
+### 2. 帮助信息 / Help
 
 ![help](./docs/screenshots/tutorial-02-help.png)
 
-### 3. Single skill install
+### 3. 单 skill 安装 / Single skill install
 
 ![single](./docs/screenshots/tutorial-03-single-skill.png)
 
-### 4. Multi-skill repository install
+### 4. 多 skill 仓库导入 / Multi-skill repository install
 
 ![bundle](./docs/screenshots/tutorial-04-bundle-skill.png)
 
-### 5. Shared link verification
+### 5. 共享链接验证 / Shared link verification
 
 ![verify](./docs/screenshots/tutorial-05-verify.png)
 
-## Regenerate The Docs Screenshots
+## 重新生成教程截图 / Regenerate The Docs Screenshots
 
 ```bash
 ./scripts/regenerate-docs.sh
 ```
 
-## Repository Contents
+## 仓库内容 / Repository Contents
 
 ```text
 shared-skill-installer/

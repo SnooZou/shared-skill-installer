@@ -99,3 +99,7 @@ Then rebuild links:
 - `Use $shared-skill-installer to import this local skill into the shared library and share it with all clients.`
 - `Use $shared-skill-installer to add TRAE to my shared clients and rebuild links.`
 - `Use $shared-skill-installer to verify whether this skill is active in every configured client.`
+- `请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库。`
+- `请使用 $shared-skill-installer，把这个本地 skill 完整入库到共享库并同步给所有客户端。`
+- `请使用 $shared-skill-installer，把 TRAE 加入共享客户端并重建所有入口。`
+- `请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。`
