@@ -160,6 +160,12 @@ my-client	${HOME}/.my-client/skills
 
 If this is your first time installing `shared-skill-installer`, use the default location and avoid overthinking the structure.
 
+Standard English prompt:
+
+```text
+Please help me install this repository: https://github.com/SnooZou/shared-skill-installer . Please create the shared skill library in the default local location, then automatically connect my locally installed AI clients so they can share this skill library.
+```
+
 - Repository: [https://github.com/SnooZou/shared-skill-installer](https://github.com/SnooZou/shared-skill-installer)
 - Default shared library location:
   - macOS / Linux: `~/AI-skills`
