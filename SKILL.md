@@ -1,129 +1,101 @@
 ---
 name: shared-skill-installer
-description: Install, migrate, merge, verify, refresh links, or document open-source and local skills into /Users/Snoo_1/AI-skills as the shared source of truth. Preserve full source trees, reuse skill maps for multi-skill repos like open-design, and update symlink entries for all configured local agent skill roots such as Codex, WorkBuddy, and TRAE.
+description: Install, migrate, verify, refresh, or document local and open-source skills into one shared library, then expose them to multiple local AI clients through symlinks. Invoke when the user wants one skill library shared by Codex, WorkBuddy, TRAE, or similar clients.
 ---
 
 # Shared Skill Installer
 
 Use this skill when the user wants to:
 
-- install a new GitHub or local skill into the shared library
-- move or copy a local skill into `AI-skills`
+- install a new GitHub or local skill into a shared library
+- move or copy a local skill into the shared library
 - import a multi-skill repository such as `open-design`
-- refresh shared links for Codex, WorkBuddy, TRAE, or other configured local agents
-- add a new local client root such as TRAE and rebuild all existing shared links
-- verify whether a shared skill is active
-- update the shared-skill README or regenerate tutorial screenshots
+- add another local AI client to the shared client list
+- rebuild links for all existing shared skills
+- verify whether a shared skill is active in each client
+- update the shared-skill documentation or tutorial screenshots
 
-## Shared paths
+## Default assumptions
 
-- Shared library root: `/Users/Snoo_1/AI-skills`
-- Core installer: `/Users/Snoo_1/AI-skills/bin/install-shared-skill`
-- Client roots config: `/Users/Snoo_1/AI-skills/.shared-skill-state/client-roots.tsv`
-- Shared README: `/Users/Snoo_1/AI-skills/README.md`
-- Screenshot generator: `/Users/Snoo_1/AI-skills/docs/generate_readme_screens.py`
+- Default shared library root: `${HOME}/AI-skills`
+- Default client roots come from `state/client-roots.tsv`
+- Default clients in the template: Codex, WorkBuddy, and TRAE
 
-Use the bundled wrapper scripts in this skill when convenient:
+The actual install script also accepts overrides through environment variables such as `SHARED_ROOT`.
 
-- `scripts/run-install.sh`
-- `scripts/verify-shared-links.sh`
-- `scripts/regenerate-docs.sh`
+## Important files in this repository
 
-## Source selection rules
-
-Choose the install mode from the source shape:
-
-1. If the source directory itself contains `SKILL.md`, treat it as a single skill and use `--local`.
-2. If the source is a repository containing many `SKILL.md` files, treat it as a bundle and use `--bundle-local`.
-3. If the user provides a GitHub repo/path or GitHub URL, use `--repo` plus `--path`, or `--url`.
-4. For `open-design`, always prefer the verified map file:
-   `/Users/Snoo_1/AI-skills/.shared-skill-state/open-design.skillmap.tsv`
-
-## Safety defaults
-
-- Preserve full source trees in `AI-skills`.
-- Default to copy behavior for local folders.
-- Use `--move-local` only when the user explicitly asks to move or merge the original folder into `AI-skills`.
-- Do not delete the external source folder unless the user asks or confirms that it is now only a backup copy.
+- `scripts/bootstrap.sh`: first-run setup for a new machine
+- `scripts/install-shared-skill`: core installer
+- `scripts/run-install.sh`: convenience wrapper
+- `scripts/verify-shared-links.sh`: verify one skill across all configured clients
+- `scripts/regenerate-docs.sh`: rebuild tutorial screenshots
+- `state/client-roots.tsv`: shared client configuration
+- `state/open-design.skillmap.tsv`: example map for a multi-skill repository
 
 ## Standard workflow
 
-1. Inspect the source and decide whether it is a single skill, a multi-skill repo, or a GitHub source.
-2. Build the `install-shared-skill` command.
-3. Run the install through `scripts/run-install.sh` or the core installer.
-4. Verify the resulting links with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
-5. If the installation changes the documented workflow, update `/Users/Snoo_1/AI-skills/README.md` and regenerate screenshots with `scripts/regenerate-docs.sh`.
-6. If a new local agent root was added, run `install-shared-skill --refresh-links` to rebuild links from every saved skill map.
+1. If this repository has not been initialized yet, run `scripts/bootstrap.sh`.
+2. Decide whether the source is:
+   - a single local skill
+   - a multi-skill local repository
+   - a GitHub repo/path or GitHub URL
+3. Use the installer with the matching mode.
+4. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
+5. If a new client root was added, run `scripts/install-shared-skill --refresh-links`.
 
-## Multi-agent sharing
-
-The set of local clients is controlled by:
-
-`/Users/Snoo_1/AI-skills/.shared-skill-state/client-roots.tsv`
-
-Format:
-
-```text
-label<TAB>/absolute/path/to/skill/root
-```
-
-Current examples:
-
-```text
-codex	/Users/Snoo_1/.codex/skills
-workbuddy	/Users/Snoo_1/.workbuddy/skills
-trae	/Users/Snoo_1/.trae/skills
-```
-
-If the user adds another local agent, update that file first, then rerun the install or verification step.
-
-## Invocation phrases that should trigger this skill
-
-- `请使用 shared-skill-installer，把这个 GitHub skill 安装到共享库`
-- `Use $shared-skill-installer to install this local skill into AI-skills and share it`
-- `把这个 open-design 风格的多 skill 仓库导入 AI-skills`
-- `请用 shared-skill-installer 验证这个 skill 现在是不是在共享库生效了`
-- `请使用 shared-skill-installer，把 TRAE 也加入共享 skill`
-- `请用 shared-skill-installer 更新共享 skill 的 README 和示意截图`
-
-## Command patterns
+## Install modes
 
 Single local skill:
 
 ```bash
-/Users/Snoo_1/AI-skills/shared-skill-installer/scripts/run-install.sh \
-  --local /path/to/skill-root
+./scripts/run-install.sh --local /path/to/skill-root
 ```
 
-Single local skill, move into shared library:
+Move a local skill into the shared library:
 
 ```bash
-/Users/Snoo_1/AI-skills/shared-skill-installer/scripts/run-install.sh \
-  --local /path/to/skill-root \
-  --move-local
+./scripts/run-install.sh --local /path/to/skill-root --move-local
 ```
 
-Bundle repository with a known map file:
+Multi-skill repository:
 
 ```bash
-/Users/Snoo_1/AI-skills/shared-skill-installer/scripts/run-install.sh \
-  --bundle-local /path/to/open-design \
-  --container-name open-design \
-  --map-file /Users/Snoo_1/AI-skills/.shared-skill-state/open-design.skillmap.tsv
+./scripts/run-install.sh \
+  --bundle-local /path/to/repo \
+  --container-name repo-name \
+  --map-file ./state/open-design.skillmap.tsv
 ```
 
 GitHub skill:
 
 ```bash
-/Users/Snoo_1/AI-skills/shared-skill-installer/scripts/run-install.sh \
-  --repo owner/repo \
-  --path path/to/skill
+./scripts/run-install.sh --repo owner/repo --path path/to/skill
 ```
 
-## Verification reminders
+Refresh every configured client link:
 
-After installation:
+```bash
+./scripts/install-shared-skill --refresh-links
+```
 
-- check that the expected link in each configured client root points to `AI-skills`
-- check the target directory exists and has realistic size
-- tell the user whether the original external folder is now only a backup
+## Adding another client
+
+Edit `state/client-roots.tsv` and add one line:
+
+```text
+my-client	${HOME}/.my-client/skills
+```
+
+Then rebuild links:
+
+```bash
+./scripts/install-shared-skill --refresh-links
+```
+
+## Invocation examples
+
+- `Use $shared-skill-installer to install this GitHub skill into my shared library.`
+- `Use $shared-skill-installer to import this local skill into the shared library and share it with all clients.`
+- `Use $shared-skill-installer to add TRAE to my shared clients and rebuild links.`
+- `Use $shared-skill-installer to verify whether this skill is active in every configured client.`

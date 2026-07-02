@@ -1,7 +1,7 @@
 interface:
   display_name: "Shared Skill Installer"
   short_description: "把新 skill 完整入库并共享给本地智能体"
-  default_prompt: "Use $shared-skill-installer to install this GitHub or local skill into /Users/Snoo_1/AI-skills and share it across my local agents."
+  default_prompt: "Use $shared-skill-installer to install this GitHub or local skill into my shared skill library and expose it to my local AI clients."
 
 policy:
   allow_implicit_invocation: true

@@ -2,12 +2,13 @@
 
 set -euo pipefail
 
-SHARED_ROOT="/Users/Snoo_1/AI-skills"
-CODEX_ROOT="/Users/Snoo_1/.codex/skills"
-WORKBUDDY_ROOT="/Users/Snoo_1/.workbuddy/skills"
-STATE_ROOT="${SHARED_ROOT}/.shared-skill-state"
-BACKUP_ROOT="${SHARED_ROOT}/.install-backups"
-CLIENT_ROOTS_FILE="${STATE_ROOT}/client-roots.tsv"
+SHARED_ROOT="${SHARED_ROOT:-${HOME}/AI-skills}"
+CODEX_ROOT="${CODEX_ROOT:-${HOME}/.codex/skills}"
+WORKBUDDY_ROOT="${WORKBUDDY_ROOT:-${HOME}/.workbuddy/skills}"
+TRAE_ROOT="${TRAE_ROOT:-${HOME}/.trae/skills}"
+STATE_ROOT="${STATE_ROOT:-${SHARED_ROOT}/.shared-skill-state}"
+BACKUP_ROOT="${BACKUP_ROOT:-${SHARED_ROOT}/.install-backups}"
+CLIENT_ROOTS_FILE="${CLIENT_ROOTS_FILE:-${STATE_ROOT}/client-roots.tsv}"
 
 FORCE=0
 DRY_RUN=0
@@ -33,16 +34,16 @@ Usage:
   install-shared-skill --url https://github.com/owner/repo/tree/ref/path/to/skill [--name skill-name] [--container-name folder-name] [--map-file skillmap.tsv] [--force] [--dry-run]
 
 What it does now:
-  1. Preserves the full source folder or GitHub repository inside /Users/Snoo_1/AI-skills
-  2. Writes a skill map manifest under /Users/Snoo_1/AI-skills/.shared-skill-state
-  3. Creates/updates symlink entries for every client root listed in /Users/Snoo_1/AI-skills/.shared-skill-state/client-roots.tsv
+  1. Preserves the full source folder or GitHub repository inside $SHARED_ROOT
+  2. Writes a skill map manifest under $SHARED_ROOT/.shared-skill-state
+  3. Creates/updates symlink entries for every client root listed in $SHARED_ROOT/.shared-skill-state/client-roots.tsv
   4. Can refresh every configured client link from existing skill maps with --refresh-links
   5. Skips Codex top-level links that would shadow a system skill (for example imagegen)
 
 Examples:
   install-shared-skill --refresh-links
-  install-shared-skill --local /Users/Snoo_1/Desktop/my-skill-repo
-  install-shared-skill --bundle-local /Users/Snoo_1/Desktop/open-design --container-name open-design --map-file /Users/Snoo_1/AI-skills/.shared-skill-state/open-design.skillmap.tsv
+  install-shared-skill --local ~/Downloads/my-skill-repo
+  install-shared-skill --bundle-local ~/Downloads/open-design --container-name open-design --map-file ./state/open-design.skillmap.tsv
   install-shared-skill --repo openai/skills --path skills/.experimental/foo
   install-shared-skill --url https://github.com/org/repo/tree/main/skills/bar --move-local
 EOF
@@ -92,8 +93,17 @@ validate_skill_dir() {
 }
 
 system_skill_conflict() {
-  local name="$1"
-  [ -d "${CODEX_ROOT}/.system/${name}" ]
+  local client_root="$1"
+  local name="$2"
+  [ -d "${client_root}/.system/${name}" ]
+}
+
+expand_path() {
+  python3 - "$1" <<'PY'
+import os
+import sys
+print(os.path.abspath(os.path.expanduser(os.path.expandvars(sys.argv[1]))))
+PY
 }
 
 emit_client_roots() {
@@ -103,6 +113,7 @@ emit_client_roots() {
     cat <<EOF
 codex	${CODEX_ROOT}
 workbuddy	${WORKBUDDY_ROOT}
+trae	${TRAE_ROOT}
 EOF
   fi
 }
@@ -270,7 +281,7 @@ ensure_client_link() {
   local label="$4"
   local link_path="${client_root}/${client_name}"
 
-  if [ "$label" = "codex" ] && system_skill_conflict "$client_name"; then
+  if [ "$label" = "codex" ] && system_skill_conflict "$client_root" "$client_name"; then
     log "Skipped Codex top-level link for ${client_name} because a system skill already owns that name"
     return 0
   fi
@@ -313,6 +324,7 @@ link_from_map() {
     while IFS=$'\t' read -r client_name client_root; do
       [ -n "${client_name}" ] || continue
       [ -n "${client_root}" ] || die "Invalid client root entry for ${client_name}"
+      client_root="$(expand_path "${client_root}")"
       ensure_client_link "$client_root" "$name" "$target" "$client_name"
     done < <(emit_client_roots)
   done < "$map_file"

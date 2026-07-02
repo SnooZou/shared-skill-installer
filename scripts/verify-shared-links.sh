@@ -5,6 +5,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CLIENTS_FILE="${ROOT}/state/client-roots.tsv"
 
+expand_path() {
+  python3 - "$1" <<'PY'
+import os
+import sys
+print(os.path.abspath(os.path.expanduser(os.path.expandvars(sys.argv[1]))))
+PY
+}
+
 usage() {
   echo "Usage: verify-shared-links.sh <skill-name>"
 }
@@ -17,11 +25,25 @@ usage() {
 SKILL_NAME="$1"
 FIRST_TARGET=""
 
+emit_client_roots() {
+  if [ -f "${CLIENTS_FILE}" ]; then
+    awk 'NF && $0 !~ /^[[:space:]]*#/' "${CLIENTS_FILE}"
+  else
+    cat <<EOF
+codex	\${HOME}/.codex/skills
+workbuddy	\${HOME}/.workbuddy/skills
+trae	\${HOME}/.trae/skills
+EOF
+  fi
+}
+
 while IFS=$'\t' read -r client_name client_root; do
   [ -n "${client_name}" ] || continue
   case "${client_name}" in
     \#*) continue ;;
   esac
+
+  client_root="$(expand_path "${client_root}")"
 
   LINK_PATH="${client_root}/${SKILL_NAME}"
   if [ -L "${LINK_PATH}" ]; then
@@ -35,7 +57,7 @@ while IFS=$'\t' read -r client_name client_root; do
   else
     printf '%s\t%s\t%s\n' "${client_name}" "missing" "${LINK_PATH}"
   fi
-done < "${CLIENTS_FILE}"
+done < <(emit_client_roots)
 
 if [ -n "${FIRST_TARGET}" ] && [ -e "${FIRST_TARGET}" ]; then
   du -sh "${FIRST_TARGET}"

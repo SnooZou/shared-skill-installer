@@ -1,4 +1,4 @@
 # label<TAB>skill_root_directory
-codex	/Users/Snoo_1/.codex/skills
-workbuddy	/Users/Snoo_1/.workbuddy/skills
-trae	/Users/Snoo_1/.trae/skills
+codex	${HOME}/.codex/skills
+workbuddy	${HOME}/.workbuddy/skills
+trae	${HOME}/.trae/skills
