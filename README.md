@@ -141,6 +141,93 @@ Use $shared-skill-installer to import this multi-skill repository into the share
 Use $shared-skill-installer to add a new local client and rebuild every shared skill link: client=my-client, root=~/.my-client/skills
 ```
 
+## 安装完成后，如何继续安装新的开源 Skill / After Setup: How To Install New Open-Source Skills
+
+是的，这个项目的目标之一，就是让你在完成首次安装后，后续都通过同一个共享 skill 来安装新的开源 skill。
+
+Yes. One of the main goals of this project is that, after the first setup, you keep using the same shared skill to install future open-source skills.
+
+### 场景 1：安装 GitHub 上的单个 skill / Scenario 1: Install a single GitHub skill
+
+如果对方给你的是一个 GitHub skill 链接，直接把链接发给智能体即可。
+
+If someone gives you a GitHub skill URL, paste that URL directly into your AI client.
+
+```text
+请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用：https://github.com/owner/repo/tree/main/path/to/skill
+```
+
+```text
+Use $shared-skill-installer to install this GitHub skill into my shared skill library and expose it to all local AI clients: https://github.com/owner/repo/tree/main/path/to/skill
+```
+
+### 场景 2：安装你本地已经下载好的 skill / Scenario 2: Install a local skill you already downloaded
+
+如果你已经把开源 skill 下载到本地，就把本地路径发给智能体。
+
+If you already downloaded the skill locally, send the local folder path to your AI client.
+
+```text
+请使用 $shared-skill-installer，把这个本地 skill 完整入库到 AI-skills，并让 Codex、WorkBuddy、TRAE 共用：/path/to/skill
+```
+
+```text
+Use $shared-skill-installer to import this local skill into AI-skills and share it with Codex, WorkBuddy, and TRAE: /path/to/skill
+```
+
+### 场景 3：安装一个包含很多子 skill 的仓库 / Scenario 3: Install a multi-skill repository
+
+像 `open-design` 这种多 skill 仓库，应该把整个仓库作为一个容器完整导入共享库。
+
+For a multi-skill repository such as `open-design`, import the full repository as one container into the shared library.
+
+```text
+请使用 $shared-skill-installer，把这个多 skill 仓库完整导入共享库，容器名叫 open-design，并刷新所有客户端入口：/path/to/open-design
+```
+
+```text
+Use $shared-skill-installer to import this multi-skill repository into the shared library under the container name open-design, then refresh all client links: /path/to/open-design
+```
+
+### 安装后怎么确认成功 / How To Confirm It Worked
+
+安装完成后，建议做两件事：
+
+After installation, do these two checks:
+
+1. 看共享库里是否已经出现完整 skill 文件夹  
+   Confirm the full skill folder now exists inside `~/AI-skills`
+2. 让安装器刷新或验证客户端入口  
+   Refresh or verify client links
+
+验证口令 / Verification prompt:
+
+```text
+请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。
+```
+
+```text
+Use $shared-skill-installer to verify whether this shared skill is active in every configured client.
+```
+
+命令行验证 / Command-line verification:
+
+```bash
+./scripts/verify-shared-links.sh skill-name
+```
+
+### 后续使用规则 / Ongoing Rule
+
+以后每次新增 skill，统一遵循这一条：
+
+For every future skill, follow this rule:
+
+- 先完整入库到 `~/AI-skills`
+- 再自动给各个本地智能体建立入口
+
+- First store the full source in `~/AI-skills`
+- Then expose it to each local AI client through links
+
 ## 常用命令 / Common Commands
 
 ### 安装单个本地 skill / Install a single local skill
