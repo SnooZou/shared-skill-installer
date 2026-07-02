@@ -105,6 +105,42 @@ Restart Codex, WorkBuddy, TRAE, or any other configured client if they do not ho
 下面这些话可以直接复制给智能体。  
 You can paste these directly into your AI client.
 
+### 不同智能体的调用示意 / Client-specific invocation examples
+
+不同本地智能体触发共享 skill 的写法会有一点差异，下面这三张截图可以直接对照着用。
+
+Different local AI clients trigger the shared skill a little differently. Use these screenshots as a quick visual guide.
+
+#### Codex
+
+- 常见写法：`$shared-skill-installer`
+- 也可以在输入框里选中对应 skill 后再发送
+
+- Common pattern: `$shared-skill-installer`
+- You can also select the matching skill in the composer before sending
+
+![Codex invocation example](./docs/screenshots/client-codex-skill-invoke.png)
+
+#### WorkBuddy
+
+- 常见写法：输入并选中 `shared-skill-installer` 技能标签
+- 重点是让输入框里出现已选中的 skill 标签
+
+- Common pattern: type and select the `shared-skill-installer` skill chip
+- The important part is that the selected skill tag appears in the composer
+
+![WorkBuddy invocation example](./docs/screenshots/client-workbuddy-skill-invoke.png)
+
+#### TRAE
+
+- 常见写法：`/shared-skill-installer`
+- 通常以前导 `/` 调用本地 skill
+
+- Common pattern: `/shared-skill-installer`
+- TRAE typically invokes local skills with a leading `/`
+
+![TRAE invocation example](./docs/screenshots/client-trae-skill-invoke.png)
+
 ### 中文口令 / Chinese prompts
 
 ```text
