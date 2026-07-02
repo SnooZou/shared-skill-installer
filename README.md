@@ -8,6 +8,28 @@ A reusable shared-skill installer template. It keeps the full source of a GitHub
 
 ## 中文说明
 
+### ⚡ 新手入口
+
+如果你是第一次安装 `shared-skill-installer` 本体，请先完成一次最短初始化。  
+这一步是在安装这个工具本身，所以此时还不能先写“请使用 `$shared-skill-installer`”。
+
+推荐默认共享技能库位置：
+
+- macOS / Linux：`~/AI-skills`
+- Windows：`%USERPROFILE%\\AI-skills`
+
+最短安装方式：
+
+```bash
+git clone https://github.com/SnooZou/shared-skill-installer.git
+cd shared-skill-installer
+./scripts/bootstrap.sh
+```
+
+安装完成后，你再通过它去安装新的 GitHub skill、本地 skill 或多 skill 仓库。
+
+---
+
 ### 📥 下载
 
 这一节告诉新用户去哪里下载、怎么直接拿到仓库。
@@ -73,9 +95,9 @@ trae	${HOME}/.trae/skills
 
 ---
 
-### 🚀 新用户首次安装
+### 🚀 手动初始化（首次安装 shared-skill-installer 本体）
 
-这一节是第一次上手的主流程，按顺序做完就能把共享 skill 机制跑起来。
+这一节是第一次上手的手动主流程，按顺序做完就能把 `shared-skill-installer` 本体和共享 skill 机制跑起来。
 
 #### 第 1 步：下载仓库
 
@@ -109,11 +131,12 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 
 ---
 
-### 💬 首次在智能体里怎么调用
+### 💬 安装完成后，在智能体里怎么调用
 
-这一节专门解决“装好以后第一句该怎么说”，并展示不同智能体之间的调用差异。
+这一节专门解决“`shared-skill-installer` 已经安装完成后，第一句该怎么说”，并展示不同智能体之间的调用差异。
 
-下面这些话可以直接复制给智能体。
+下面这些话只适用于：`shared-skill-installer` 已经安装完成之后。  
+你可以直接复制给智能体。
 
 #### 不同智能体的调用示意
 
@@ -364,6 +387,28 @@ shared-skill-installer/
 
 ## English Guide
 
+### ⚡ Quick Start For New Users
+
+If this is your first time installing `shared-skill-installer` itself, do one short bootstrap first.  
+At this stage, do not start with “Use `$shared-skill-installer`” yet, because the installer has not been installed.
+
+Recommended default shared library location:
+
+- macOS / Linux: `~/AI-skills`
+- Windows: `%USERPROFILE%\\AI-skills`
+
+Shortest install path:
+
+```bash
+git clone https://github.com/SnooZou/shared-skill-installer.git
+cd shared-skill-installer
+./scripts/bootstrap.sh
+```
+
+After that, use `shared-skill-installer` to install new GitHub skills, local skills, or multi-skill repositories.
+
+---
+
 ### 📥 Download
 
 This section tells new users where to download the project and how to get the repository quickly.
@@ -429,9 +474,9 @@ Client config file:
 
 ---
 
-### 🚀 First-Time Setup
+### 🚀 Manual Bootstrap (Install `shared-skill-installer` Itself First)
 
-This is the main first-run workflow. Follow it in order to get the shared skill system working.
+This is the manual first-run workflow for installing `shared-skill-installer` itself and bringing the shared skill system online.
 
 #### Step 1: Get the repository
 
@@ -465,11 +510,12 @@ Restart Codex, WorkBuddy, TRAE, or any other configured client if they do not ho
 
 ---
 
-### 💬 First Prompts To Use In Your AI Client
+### 💬 After Installation: First Prompts To Use In Your AI Client
 
-This section focuses on what to say after setup and shows the small invocation differences between clients.
+This section focuses on what to say after `shared-skill-installer` is already installed and shows the small invocation differences between clients.
 
-You can paste these directly into your AI client.
+These prompts only apply after `shared-skill-installer` has been installed.  
+You can paste them directly into your AI client.
 
 #### Client-specific invocation examples
 
