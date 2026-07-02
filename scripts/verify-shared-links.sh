@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CLIENTS_FILE="${ROOT}/state/client-roots.tsv"
+
+usage() {
+  echo "Usage: verify-shared-links.sh <skill-name>"
+}
+
+[ "$#" -eq 1 ] || {
+  usage
+  exit 1
+}
+
+SKILL_NAME="$1"
+FIRST_TARGET=""
+
+while IFS=$'\t' read -r client_name client_root; do
+  [ -n "${client_name}" ] || continue
+  case "${client_name}" in
+    \#*) continue ;;
+  esac
+
+  LINK_PATH="${client_root}/${SKILL_NAME}"
+  if [ -L "${LINK_PATH}" ]; then
+    TARGET="$(readlink "${LINK_PATH}")"
+    printf '%s\t%s\t%s\n' "${client_name}" "linked" "${TARGET}"
+    if [ -z "${FIRST_TARGET}" ]; then
+      FIRST_TARGET="${TARGET}"
+    fi
+  elif [ -e "${LINK_PATH}" ]; then
+    printf '%s\t%s\t%s\n' "${client_name}" "exists-not-symlink" "${LINK_PATH}"
+  else
+    printf '%s\t%s\t%s\n' "${client_name}" "missing" "${LINK_PATH}"
+  fi
+done < "${CLIENTS_FILE}"
+
+if [ -n "${FIRST_TARGET}" ] && [ -e "${FIRST_TARGET}" ]; then
+  du -sh "${FIRST_TARGET}"
+fi

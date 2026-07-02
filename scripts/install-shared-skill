@@ -1,0 +1,519 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SHARED_ROOT="/Users/Snoo_1/AI-skills"
+CODEX_ROOT="/Users/Snoo_1/.codex/skills"
+WORKBUDDY_ROOT="/Users/Snoo_1/.workbuddy/skills"
+STATE_ROOT="${SHARED_ROOT}/.shared-skill-state"
+BACKUP_ROOT="${SHARED_ROOT}/.install-backups"
+CLIENT_ROOTS_FILE="${STATE_ROOT}/client-roots.tsv"
+
+FORCE=0
+DRY_RUN=0
+MOVE_LOCAL=0
+SOURCE_MODE=""
+LOCAL_PATH=""
+LOCAL_BUNDLE_PATH=""
+GITHUB_REPO=""
+GITHUB_URL=""
+GITHUB_PATH=""
+GITHUB_REF=""
+DEST_NAME=""
+CONTAINER_NAME=""
+MAP_FILE=""
+
+usage() {
+  cat <<'EOF'
+Usage:
+  install-shared-skill --local /path/to/skill-root [--name skill-name] [--container-name folder-name] [--move-local] [--force] [--dry-run]
+  install-shared-skill --bundle-local /path/to/repo-or-folder [--container-name folder-name] [--map-file skillmap.tsv] [--move-local] [--force] [--dry-run]
+  install-shared-skill --repo owner/repo [--path relative/skill/path] [--ref branch-or-tag] [--name skill-name] [--container-name folder-name] [--map-file skillmap.tsv] [--force] [--dry-run]
+  install-shared-skill --url https://github.com/owner/repo/tree/ref/path/to/skill [--name skill-name] [--container-name folder-name] [--map-file skillmap.tsv] [--force] [--dry-run]
+
+What it does now:
+  1. Preserves the full source folder or GitHub repository inside /Users/Snoo_1/AI-skills
+  2. Writes a skill map manifest under /Users/Snoo_1/AI-skills/.shared-skill-state
+  3. Creates/updates symlink entries for every client root listed in /Users/Snoo_1/AI-skills/.shared-skill-state/client-roots.tsv
+  4. Skips Codex top-level links that would shadow a system skill (for example imagegen)
+
+Examples:
+  install-shared-skill --local /Users/Snoo_1/Desktop/my-skill-repo
+  install-shared-skill --bundle-local /Users/Snoo_1/Desktop/open-design --container-name open-design --map-file /Users/Snoo_1/AI-skills/.shared-skill-state/open-design.skillmap.tsv
+  install-shared-skill --repo openai/skills --path skills/.experimental/foo
+  install-shared-skill --url https://github.com/org/repo/tree/main/skills/bar --move-local
+EOF
+}
+
+die() {
+  echo "Error: $*" >&2
+  exit 1
+}
+
+log() {
+  echo "[install-shared-skill] $*"
+}
+
+run_cmd() {
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    printf '[dry-run] '
+    printf '%q ' "$@"
+    printf '\n'
+    return 0
+  fi
+  "$@"
+}
+
+backup_path() {
+  local src="$1"
+  local bucket="$2"
+  local name
+  name="$(basename "$src")"
+  local ts
+  ts="$(date '+%Y%m%d-%H%M%S')"
+  local dest="${BACKUP_ROOT}/${ts}/${bucket}/${name}"
+  run_cmd mkdir -p "$(dirname "$dest")"
+  run_cmd mv "$src" "$dest"
+  log "Backed up ${src} -> ${dest}"
+}
+
+validate_dir() {
+  local dir="$1"
+  [ -d "$dir" ] || die "Directory not found: $dir"
+}
+
+validate_skill_dir() {
+  local dir="$1"
+  validate_dir "$dir"
+  [ -f "$dir/SKILL.md" ] || die "SKILL.md not found in: $dir"
+}
+
+system_skill_conflict() {
+  local name="$1"
+  [ -d "${CODEX_ROOT}/.system/${name}" ]
+}
+
+emit_client_roots() {
+  if [ -f "${CLIENT_ROOTS_FILE}" ]; then
+    awk 'NF && $0 !~ /^[[:space:]]*#/' "${CLIENT_ROOTS_FILE}"
+  else
+    cat <<EOF
+codex	${CODEX_ROOT}
+workbuddy	${WORKBUDDY_ROOT}
+EOF
+  fi
+}
+
+default_container_name() {
+  local path="$1"
+  basename "$path"
+}
+
+ensure_container_slot() {
+  local container="$1"
+  local dest="${SHARED_ROOT}/${container}"
+  if [ -e "$dest" ]; then
+    if [ "${FORCE}" -ne 1 ]; then
+      die "Shared destination already exists: ${dest} (use --force to replace)"
+    fi
+    backup_path "$dest" "shared"
+  fi
+}
+
+preserve_local_tree() {
+  local src="$1"
+  local container="$2"
+  local dest="${SHARED_ROOT}/${container}"
+
+  ensure_container_slot "$container"
+  run_cmd mkdir -p "$SHARED_ROOT"
+
+  if [ "${MOVE_LOCAL}" -eq 1 ]; then
+    run_cmd mv "$src" "$dest"
+    log "Moved full source tree into shared root: ${dest}"
+  else
+    run_cmd mkdir -p "$dest"
+    run_cmd rsync -a "${src}/" "${dest}/"
+    log "Copied full source tree into shared root: ${dest}"
+  fi
+}
+
+parse_github_url() {
+  local url="$1"
+  python3 - "$url" <<'PY'
+import sys
+from urllib.parse import urlparse
+
+url = sys.argv[1]
+parsed = urlparse(url)
+parts = [p for p in parsed.path.strip("/").split("/") if p]
+if len(parts) < 2:
+    raise SystemExit("Invalid GitHub URL")
+owner, repo = parts[0], parts[1]
+repo = repo[:-4] if repo.endswith(".git") else repo
+ref = ""
+subpath = ""
+if len(parts) >= 4 and parts[2] == "tree":
+    ref = parts[3]
+    if len(parts) > 4:
+        subpath = "/".join(parts[4:])
+print(f"{owner}/{repo}\t{ref}\t{subpath}")
+PY
+}
+
+clone_github_repo() {
+  local repo="$1"
+  local ref="$2"
+  local container="$3"
+  local dest="${SHARED_ROOT}/${container}"
+  local repo_url="https://github.com/${repo}.git"
+
+  ensure_container_slot "$container"
+  run_cmd mkdir -p "$SHARED_ROOT"
+  run_cmd git clone "$repo_url" "$dest"
+
+  if [ -n "$ref" ]; then
+    run_cmd git -C "$dest" checkout "$ref"
+  fi
+
+  log "Cloned full GitHub repository into shared root: ${dest}"
+}
+
+skill_relpath() {
+  python3 - "$1" "$2" <<'PY'
+from pathlib import Path
+import sys
+root = Path(sys.argv[1]).resolve()
+target = Path(sys.argv[2]).resolve()
+print(target.relative_to(root).as_posix())
+PY
+}
+
+scan_skill_map() {
+  local repo_root="$1"
+  local output_file="$2"
+  local seen_names_file
+  seen_names_file="$(mktemp)"
+  : > "$output_file"
+
+  local dir name rel
+  while IFS= read -r dir; do
+    name="$(basename "$dir")"
+    if grep -qxF "$name" "$seen_names_file"; then
+      log "Skipped duplicate skill name ${name}: ${dir}"
+      continue
+    fi
+    printf '%s\n' "$name" >> "$seen_names_file"
+    rel="$(skill_relpath "$repo_root" "$dir")"
+    printf '%s\t%s\n' "$name" "$rel" >> "$output_file"
+  done < <(
+    find "$repo_root" \
+      \( -type d \( -name .git -o -name node_modules -o -name .next -o -name .tmp -o -name dist -o -name build \) -prune \) -o \
+      \( -type f -name SKILL.md -print \) \
+      | sed 's#/SKILL\.md$##' \
+      | sort
+  )
+
+  rm -f "$seen_names_file"
+}
+
+build_single_skill_map() {
+  local repo_root="$1"
+  local skill_dir="$2"
+  local output_file="$3"
+  local skill_name="$4"
+  local rel
+  rel="$(skill_relpath "$repo_root" "$skill_dir")"
+  printf '%s\t%s\n' "$skill_name" "$rel" > "$output_file"
+}
+
+write_skill_map() {
+  local container="$1"
+  local repo_root="$2"
+  local map_mode="$3"
+  local output_file="${STATE_ROOT}/${container}.skillmap.tsv"
+
+  run_cmd mkdir -p "$STATE_ROOT"
+
+  if [ "$map_mode" = "scan" ]; then
+    scan_skill_map "$repo_root" "$output_file"
+    log "Wrote skill map: ${output_file}"
+  else
+    local skill_dir="$4"
+    local skill_name="$5"
+    build_single_skill_map "$repo_root" "$skill_dir" "$output_file" "$skill_name"
+    log "Wrote skill map: ${output_file}"
+  fi
+}
+
+copy_skill_map_file() {
+  local container="$1"
+  local src_map="$2"
+  local dest_map="${STATE_ROOT}/${container}.skillmap.tsv"
+  [ -f "$src_map" ] || die "Skill map not found: $src_map"
+  run_cmd mkdir -p "$STATE_ROOT"
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    log "Would copy skill map ${src_map} -> ${dest_map}"
+  else
+    cp "$src_map" "$dest_map"
+    log "Copied skill map: ${dest_map}"
+  fi
+}
+
+ensure_client_link() {
+  local client_root="$1"
+  local client_name="$2"
+  local target="$3"
+  local label="$4"
+  local link_path="${client_root}/${client_name}"
+
+  if [ "$label" = "codex" ] && system_skill_conflict "$client_name"; then
+    log "Skipped Codex top-level link for ${client_name} because a system skill already owns that name"
+    return 0
+  fi
+
+  run_cmd mkdir -p "$client_root"
+
+  if [ -L "$link_path" ]; then
+    local current_target
+    current_target="$(readlink "$link_path" || true)"
+    if [ "$current_target" = "$target" ]; then
+      log "${label} link already up to date: ${link_path}"
+      return 0
+    fi
+    run_cmd rm -f "$link_path"
+  elif [ -e "$link_path" ]; then
+    backup_path "$link_path" "$label"
+  fi
+
+  run_cmd ln -s "$target" "$link_path"
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    log "Would link ${label}: ${link_path} -> ${target}"
+  else
+    log "Linked ${label}: ${link_path} -> ${target}"
+  fi
+}
+
+link_from_map() {
+  local container="$1"
+  local map_file="${2:-${STATE_ROOT}/${container}.skillmap.tsv}"
+  local repo_root="${SHARED_ROOT}/${container}"
+  [ -f "$map_file" ] || die "Skill map not found: ${map_file}"
+
+  local name rel target client_name client_root
+  while IFS=$'\t' read -r name rel; do
+    [ -n "$name" ] || continue
+    target="${repo_root}/${rel}"
+    if [ "${DRY_RUN}" -ne 1 ] && [ ! -d "$target" ]; then
+      die "Skill target missing for ${name}: ${target}"
+    fi
+    while IFS=$'\t' read -r client_name client_root; do
+      [ -n "${client_name}" ] || continue
+      [ -n "${client_root}" ] || die "Invalid client root entry for ${client_name}"
+      ensure_client_link "$client_root" "$name" "$target" "$client_name"
+    done < <(emit_client_roots)
+  done < "$map_file"
+}
+
+install_from_local() {
+  validate_skill_dir "$LOCAL_PATH"
+
+  local container
+  if [ -n "$CONTAINER_NAME" ]; then
+    container="$CONTAINER_NAME"
+  else
+    container="$(default_container_name "$LOCAL_PATH")"
+  fi
+
+  local skill_name
+  if [ -n "$DEST_NAME" ]; then
+    skill_name="$DEST_NAME"
+  else
+    skill_name="$(basename "$LOCAL_PATH")"
+  fi
+
+  preserve_local_tree "$LOCAL_PATH" "$container"
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    write_skill_map "$container" "$LOCAL_PATH" "single" "$LOCAL_PATH" "$skill_name"
+  else
+    write_skill_map "$container" "${SHARED_ROOT}/${container}" "single" "${SHARED_ROOT}/${container}" "$skill_name"
+  fi
+  link_from_map "$container"
+}
+
+install_from_local_bundle() {
+  validate_dir "$LOCAL_BUNDLE_PATH"
+  [ -z "$DEST_NAME" ] || die "--name is only supported with --local/--repo/--url, not --bundle-local"
+
+  local container
+  if [ -n "$CONTAINER_NAME" ]; then
+    container="$CONTAINER_NAME"
+  else
+    container="$(default_container_name "$LOCAL_BUNDLE_PATH")"
+  fi
+
+  preserve_local_tree "$LOCAL_BUNDLE_PATH" "$container"
+  if [ -n "$MAP_FILE" ]; then
+    copy_skill_map_file "$container" "$MAP_FILE"
+    if [ "${DRY_RUN}" -eq 1 ]; then
+      link_from_map "$container" "$MAP_FILE"
+      return 0
+    fi
+  elif [ "${DRY_RUN}" -eq 1 ]; then
+    write_skill_map "$container" "$LOCAL_BUNDLE_PATH" "scan"
+  else
+    write_skill_map "$container" "${SHARED_ROOT}/${container}" "scan"
+  fi
+  link_from_map "$container"
+}
+
+install_from_github() {
+  local repo="$GITHUB_REPO"
+  local ref="$GITHUB_REF"
+  local subpath="$GITHUB_PATH"
+
+  if [ -n "$GITHUB_URL" ]; then
+    local parsed
+    parsed="$(parse_github_url "$GITHUB_URL")"
+    repo="$(printf '%s' "$parsed" | cut -f1)"
+    if [ -z "$ref" ]; then
+      ref="$(printf '%s' "$parsed" | cut -f2)"
+    fi
+    if [ -z "$subpath" ]; then
+      subpath="$(printf '%s' "$parsed" | cut -f3)"
+    fi
+  fi
+
+  [ -n "$repo" ] || die "GitHub mode requires --repo or --url"
+
+  local container
+  if [ -n "$CONTAINER_NAME" ]; then
+    container="$CONTAINER_NAME"
+  else
+    container="$(basename "$repo")"
+  fi
+
+  clone_github_repo "$repo" "$ref" "$container"
+
+  local repo_root="${SHARED_ROOT}/${container}"
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    if [ -n "$subpath" ]; then
+      local skill_name_preview
+      if [ -n "$DEST_NAME" ]; then
+        skill_name_preview="$DEST_NAME"
+      else
+        skill_name_preview="$(basename "$subpath")"
+      fi
+      log "Would map ${skill_name_preview} -> ${repo_root}/${subpath}"
+    else
+      log "Would scan all skills under ${repo_root} after clone"
+    fi
+    log "Dry run complete."
+    return 0
+  fi
+
+  if [ -n "$subpath" ]; then
+    local skill_dir="${repo_root}/${subpath}"
+    validate_skill_dir "$skill_dir"
+    local skill_name
+    if [ -n "$DEST_NAME" ]; then
+      skill_name="$DEST_NAME"
+    else
+      skill_name="$(basename "$skill_dir")"
+    fi
+    write_skill_map "$container" "$repo_root" "single" "$skill_dir" "$skill_name"
+  elif [ -n "$MAP_FILE" ]; then
+    [ -z "$DEST_NAME" ] || die "--name cannot be combined with --map-file"
+    copy_skill_map_file "$container" "$MAP_FILE"
+  else
+    [ -z "$DEST_NAME" ] || die "--name requires a specific skill path in GitHub mode"
+    write_skill_map "$container" "$repo_root" "scan"
+  fi
+
+  link_from_map "$container"
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --local)
+      SOURCE_MODE="local"
+      LOCAL_PATH="${2:-}"
+      shift 2
+      ;;
+    --bundle-local)
+      SOURCE_MODE="bundle-local"
+      LOCAL_BUNDLE_PATH="${2:-}"
+      shift 2
+      ;;
+    --repo)
+      SOURCE_MODE="github"
+      GITHUB_REPO="${2:-}"
+      shift 2
+      ;;
+    --url)
+      SOURCE_MODE="github"
+      GITHUB_URL="${2:-}"
+      shift 2
+      ;;
+    --path)
+      GITHUB_PATH="${2:-}"
+      shift 2
+      ;;
+    --ref)
+      GITHUB_REF="${2:-}"
+      shift 2
+      ;;
+    --name)
+      DEST_NAME="${2:-}"
+      shift 2
+      ;;
+    --container-name)
+      CONTAINER_NAME="${2:-}"
+      shift 2
+      ;;
+    --map-file)
+      MAP_FILE="${2:-}"
+      shift 2
+      ;;
+    --move-local)
+      MOVE_LOCAL=1
+      shift
+      ;;
+    --force)
+      FORCE=1
+      shift
+      ;;
+    --dry-run)
+      DRY_RUN=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+[ -n "$SOURCE_MODE" ] || {
+  usage
+  exit 1
+}
+
+if [ "$SOURCE_MODE" = "local" ]; then
+  [ -n "$LOCAL_PATH" ] || die "--local requires a path"
+  install_from_local
+elif [ "$SOURCE_MODE" = "bundle-local" ]; then
+  [ -n "$LOCAL_BUNDLE_PATH" ] || die "--bundle-local requires a path"
+  install_from_local_bundle
+else
+  install_from_github
+fi
+
+if [ "${DRY_RUN}" -eq 1 ]; then
+  log "Dry run complete."
+else
+  log "Done. Restart clients if they do not hot-reload the new skill."
+fi
