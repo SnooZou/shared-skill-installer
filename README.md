@@ -49,7 +49,7 @@ git clone https://github.com/SnooZou/shared-skill-installer.git
 
 这一节帮助读者先理解“为什么要用它”，再往下看安装和使用方法。
 
-![中文总览配图](./docs/screenshots/overview-zh.png)
+![中文总览配图](./docs/screenshots/overview-zh.jpg)
 
 - 只保留一份共享源码库，避免同一个 skill 在多个智能体目录里重复安装
 - 新 skill 默认完整入库，不做删减，尽量保留原始源码结构
@@ -329,7 +329,7 @@ my-client	${HOME}/.my-client/skills
 
 #### 1. 总览
 
-![overview zh](./docs/screenshots/overview-zh.png)
+![overview zh](./docs/screenshots/overview-zh.jpg)
 
 #### 2. 帮助信息
 
@@ -428,7 +428,7 @@ git clone https://github.com/SnooZou/shared-skill-installer.git
 
 This section helps readers understand why the project exists before they move into setup and usage.
 
-![English overview graphic](./docs/screenshots/overview-en.png)
+![English overview graphic](./docs/screenshots/overview-en.jpg)
 
 - Keeps one shared source of truth for local skills
 - Preserves full source trees instead of trimming files during install
@@ -708,7 +708,7 @@ This section contains tutorial screenshots so new users can understand the workf
 
 #### 1. Overview
 
-![overview en](./docs/screenshots/overview-en.png)
+![overview en](./docs/screenshots/overview-en.jpg)
 
 #### 2. Help
 
