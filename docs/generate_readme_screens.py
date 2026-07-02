@@ -123,7 +123,7 @@ def save(img: Image.Image, name: str):
 
 def generate_overview():
     img, draw = canvas(1600, 1000)
-    title_block(draw, "AI-skills 共享安装流程", "以后新的 skill 一律完整入库到 AI-skills，再给本地智能体建立共享入口")
+    title_block(draw, "AI-skills 共享安装流程", "以后新的 skill 一律完整入库到 AI-skills，再给 Codex、WorkBuddy、TRAE 建共享入口")
 
     bullet_card(
         draw,
@@ -152,7 +152,7 @@ def generate_overview():
         (1100, 190, 1530, 860),
         "Step 3  共享",
         [
-            "Codex、WorkBuddy 等本地智能体只保留软链接入口",
+            "Codex、WorkBuddy、TRAE 只保留软链接入口",
             "入口统一指向 AI-skills 内的真实 skill 目录",
             "原始外部下载目录不再参与运行，可留作备份或删除",
         ],
@@ -217,19 +217,21 @@ def generate_bundle_install():
 
 def generate_verify():
     img, draw = canvas(1600, 1000)
-    title_block(draw, "验证共享是否生效", "检查 Codex、WorkBuddy 的入口是否都指向 AI-skills，并确认源码仓库真实大小")
+    title_block(draw, "验证共享是否生效", "检查 Codex、WorkBuddy、TRAE 的入口是否都指向 AI-skills，并确认源码仓库真实大小")
     verify = run(
         [
             "zsh",
             "-lc",
             textwrap.dedent(
                 f"""
-                printf '$ readlink /Users/Snoo_1/.codex/skills/open-design-landing\\n'
-                readlink /Users/Snoo_1/.codex/skills/open-design-landing
-                printf '\\n$ readlink /Users/Snoo_1/.workbuddy/skills/open-design-landing\\n'
-                readlink /Users/Snoo_1/.workbuddy/skills/open-design-landing
-                printf '\\n$ du -sh /Users/Snoo_1/AI-skills/open-design\\n'
-                du -sh /Users/Snoo_1/AI-skills/open-design
+                printf '$ readlink /Users/Snoo_1/.codex/skills/shared-skill-installer\\n'
+                readlink /Users/Snoo_1/.codex/skills/shared-skill-installer
+                printf '\\n$ readlink /Users/Snoo_1/.workbuddy/skills/shared-skill-installer\\n'
+                readlink /Users/Snoo_1/.workbuddy/skills/shared-skill-installer
+                printf '\\n$ readlink /Users/Snoo_1/.trae/skills/shared-skill-installer\\n'
+                readlink /Users/Snoo_1/.trae/skills/shared-skill-installer
+                printf '\\n$ du -sh /Users/Snoo_1/AI-skills/shared-skill-installer\\n'
+                du -sh /Users/Snoo_1/AI-skills/shared-skill-installer
                 """
             ).strip(),
         ]
@@ -240,15 +242,12 @@ def generate_verify():
         """
         /Users/Snoo_1/AI-skills
         ├── bin/install-shared-skill
+        ├── .shared-skill-state/client-roots.tsv
         ├── .shared-skill-state/open-design.skillmap.tsv
         ├── claude-skill-web-clone/
         ├── ppt-master/
-        └── open-design/
-            ├── design-templates/
-            ├── plugins/
-            ├── skills/
-            ├── node_modules/
-            └── .git/
+        ├── open-design/
+        └── shared-skill-installer/
         """
     ).strip()
     terminal_card(draw, (70, 760, 1530, 940), "shared library layout", tree_text)

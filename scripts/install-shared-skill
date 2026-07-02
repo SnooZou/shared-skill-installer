@@ -26,6 +26,7 @@ MAP_FILE=""
 usage() {
   cat <<'EOF'
 Usage:
+  install-shared-skill --refresh-links [--dry-run]
   install-shared-skill --local /path/to/skill-root [--name skill-name] [--container-name folder-name] [--move-local] [--force] [--dry-run]
   install-shared-skill --bundle-local /path/to/repo-or-folder [--container-name folder-name] [--map-file skillmap.tsv] [--move-local] [--force] [--dry-run]
   install-shared-skill --repo owner/repo [--path relative/skill/path] [--ref branch-or-tag] [--name skill-name] [--container-name folder-name] [--map-file skillmap.tsv] [--force] [--dry-run]
@@ -35,9 +36,11 @@ What it does now:
   1. Preserves the full source folder or GitHub repository inside /Users/Snoo_1/AI-skills
   2. Writes a skill map manifest under /Users/Snoo_1/AI-skills/.shared-skill-state
   3. Creates/updates symlink entries for every client root listed in /Users/Snoo_1/AI-skills/.shared-skill-state/client-roots.tsv
-  4. Skips Codex top-level links that would shadow a system skill (for example imagegen)
+  4. Can refresh every configured client link from existing skill maps with --refresh-links
+  5. Skips Codex top-level links that would shadow a system skill (for example imagegen)
 
 Examples:
+  install-shared-skill --refresh-links
   install-shared-skill --local /Users/Snoo_1/Desktop/my-skill-repo
   install-shared-skill --bundle-local /Users/Snoo_1/Desktop/open-design --container-name open-design --map-file /Users/Snoo_1/AI-skills/.shared-skill-state/open-design.skillmap.tsv
   install-shared-skill --repo openai/skills --path skills/.experimental/foo
@@ -315,6 +318,27 @@ link_from_map() {
   done < "$map_file"
 }
 
+refresh_all_links() {
+  run_cmd mkdir -p "$STATE_ROOT"
+
+  local found=0
+  local map_file container
+  while IFS= read -r map_file; do
+    [ -n "$map_file" ] || continue
+    container="$(basename "$map_file" .skillmap.tsv)"
+    found=1
+    link_from_map "$container" "$map_file"
+  done < <(
+    find "$STATE_ROOT" -maxdepth 1 -type f -name '*.skillmap.tsv' \
+      ! -name '*-preview.skillmap.tsv' \
+      | sort
+  )
+
+  if [ "$found" -eq 0 ]; then
+    die "No skill maps found under ${STATE_ROOT}"
+  fi
+}
+
 install_from_local() {
   validate_skill_dir "$LOCAL_PATH"
 
@@ -440,6 +464,10 @@ while [ "$#" -gt 0 ]; do
       LOCAL_PATH="${2:-}"
       shift 2
       ;;
+    --refresh-links)
+      SOURCE_MODE="refresh-links"
+      shift
+      ;;
     --bundle-local)
       SOURCE_MODE="bundle-local"
       LOCAL_BUNDLE_PATH="${2:-}"
@@ -508,6 +536,8 @@ if [ "$SOURCE_MODE" = "local" ]; then
 elif [ "$SOURCE_MODE" = "bundle-local" ]; then
   [ -n "$LOCAL_BUNDLE_PATH" ] || die "--bundle-local requires a path"
   install_from_local_bundle
+elif [ "$SOURCE_MODE" = "refresh-links" ]; then
+  refresh_all_links
 else
   install_from_github
 fi

@@ -8,7 +8,8 @@
 - 安装 GitHub 上的 skill
 - 导入像 `open-design` 这样的多 skill 仓库
 - 保留完整源码，不做默认删减
-- 自动建立 `Codex`、`WorkBuddy` 等本地智能体入口软链接
+- 自动建立 `Codex`、`WorkBuddy`、`TRAE` 等本地智能体入口软链接
+- 在新增本地智能体后统一刷新所有共享链接
 - 验证共享是否已经生效
 - 重生 README 教程截图
 
@@ -29,7 +30,8 @@ shared-skill-installer/
 │   └── screenshots/
 └── state/
     ├── client-roots.tsv
-    └── open-design.skillmap.tsv
+    ├── open-design.skillmap.tsv
+    └── shared-skill-installer.skillmap.tsv
 ```
 
 ## 教程图
@@ -50,21 +52,39 @@ shared-skill-installer/
 
 ![bundle](./docs/screenshots/tutorial-04-bundle-skill.png)
 
-### 5. 验证共享生效
+### 5. 验证三端共享生效
 
 ![verify](./docs/screenshots/tutorial-05-verify.png)
 
+## 当前共享客户端
+
+共享目标由这个文件控制：
+
+- [`state/client-roots.tsv`](./state/client-roots.tsv)
+
+当前示例：
+
+```text
+codex	/Users/Snoo_1/.codex/skills
+workbuddy	/Users/Snoo_1/.workbuddy/skills
+trae	/Users/Snoo_1/.trae/skills
+```
+
+其中 TRAE 采用的是：
+
+- `/Users/Snoo_1/.trae/skills`
+
+这样能和它自己的 `.trae/skills/<skill-name>/` 约定保持一致，同时不去改动 `~/.trae-cn/builtin_skills` 内置 skill 区域。
+
 ## 在本机如何激活这个 skill
 
-如果这个 skill 已经在你的共享库里，并且 `Codex` / `WorkBuddy` 已经建立好入口，那么直接重启一次客户端即可识别。
+如果这个 skill 已经放进你的共享库，并且 `Codex` / `WorkBuddy` / `TRAE` 已经建立好入口，那么重启一次客户端即可识别。
 
 当前 live 版本位置是：
 
 - `/Users/Snoo_1/AI-skills/shared-skill-installer`
 
 ## 每次安装新 skill 时怎么调用
-
-最直接的调用方式有两种。
 
 ### 方式 1：自然语言点名
 
@@ -78,6 +98,10 @@ shared-skill-installer/
 
 ```text
 请使用 shared-skill-installer，把这个多 skill 仓库导入 AI-skills，并保留完整源码：/path/to/repo
+```
+
+```text
+请使用 shared-skill-installer，把 TRAE 也加入共享 skill，并刷新所有现有入口
 ```
 
 ### 方式 2：技能语法
@@ -113,10 +137,16 @@ Use $shared-skill-installer to import this GitHub skill into the shared library:
   --map-file ./state/open-design.skillmap.tsv
 ```
 
-验证某个 skill 是否共享生效：
+新增客户端后刷新全部共享链接：
 
 ```bash
-./scripts/verify-shared-links.sh claude-skill-web-clone
+./scripts/install-shared-skill --refresh-links
+```
+
+验证某个 skill 是否三端共享：
+
+```bash
+./scripts/verify-shared-links.sh shared-skill-installer
 ```
 
 重生教程截图：
@@ -125,31 +155,15 @@ Use $shared-skill-installer to import this GitHub skill into the shared library:
 ./scripts/regenerate-docs.sh
 ```
 
-## 多智能体共享是怎么控制的
-
-共享目标由这个文件控制：
-
-- [`state/client-roots.tsv`](./state/client-roots.tsv)
-
-格式：
-
-```text
-label<TAB>/absolute/path/to/skill/root
-```
-
-例如：
-
-```text
-codex	/Users/Snoo_1/.codex/skills
-workbuddy	/Users/Snoo_1/.workbuddy/skills
-```
-
-以后如果你新增新的本地智能体，只要往这个文件追加一行，再重新安装或重新验证一次即可。
-
 ## 说明
 
-这个 GitHub 目录是归档包；你机器上真正正在运行的共享库仍然是：
+这个仓库负责保存：
+
+- skill 本体
+- 本地安装与验证脚本
+- 教程截图
+- client roots 配置
+
+你机器上真正正在运行的共享库仍然是：
 
 - `/Users/Snoo_1/AI-skills`
-
-也就是说，这里负责保存 skill、本地脚本、README 和教程截图；本机实际生效则由 `AI-skills` 目录承接。

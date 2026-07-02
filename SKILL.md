@@ -1,6 +1,6 @@
 ---
 name: shared-skill-installer
-description: Install, migrate, merge, verify, or document open-source and local skills into /Users/Snoo_1/AI-skills as the shared source of truth. Preserve full source trees, reuse skill maps for multi-skill repos like open-design, and update symlink entries for all configured local agent skill roots such as Codex and WorkBuddy.
+description: Install, migrate, merge, verify, refresh links, or document open-source and local skills into /Users/Snoo_1/AI-skills as the shared source of truth. Preserve full source trees, reuse skill maps for multi-skill repos like open-design, and update symlink entries for all configured local agent skill roots such as Codex, WorkBuddy, and TRAE.
 ---
 
 # Shared Skill Installer
@@ -10,7 +10,8 @@ Use this skill when the user wants to:
 - install a new GitHub or local skill into the shared library
 - move or copy a local skill into `AI-skills`
 - import a multi-skill repository such as `open-design`
-- refresh shared links for Codex, WorkBuddy, or other configured local agents
+- refresh shared links for Codex, WorkBuddy, TRAE, or other configured local agents
+- add a new local client root such as TRAE and rebuild all existing shared links
 - verify whether a shared skill is active
 - update the shared-skill README or regenerate tutorial screenshots
 
@@ -52,6 +53,7 @@ Choose the install mode from the source shape:
 3. Run the install through `scripts/run-install.sh` or the core installer.
 4. Verify the resulting links with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
 5. If the installation changes the documented workflow, update `/Users/Snoo_1/AI-skills/README.md` and regenerate screenshots with `scripts/regenerate-docs.sh`.
+6. If a new local agent root was added, run `install-shared-skill --refresh-links` to rebuild links from every saved skill map.
 
 ## Multi-agent sharing
 
@@ -70,6 +72,7 @@ Current examples:
 ```text
 codex	/Users/Snoo_1/.codex/skills
 workbuddy	/Users/Snoo_1/.workbuddy/skills
+trae	/Users/Snoo_1/.trae/skills
 ```
 
 If the user adds another local agent, update that file first, then rerun the install or verification step.
@@ -80,6 +83,7 @@ If the user adds another local agent, update that file first, then rerun the ins
 - `Use $shared-skill-installer to install this local skill into AI-skills and share it`
 - `把这个 open-design 风格的多 skill 仓库导入 AI-skills`
 - `请用 shared-skill-installer 验证这个 skill 现在是不是在共享库生效了`
+- `请使用 shared-skill-installer，把 TRAE 也加入共享 skill`
 - `请用 shared-skill-installer 更新共享 skill 的 README 和示意截图`
 
 ## Command patterns
