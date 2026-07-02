@@ -323,42 +323,6 @@ my-client	${HOME}/.my-client/skills
 
 ---
 
-### 🖼️ 教程截图
-
-这一节放的是教程示意图，帮助新用户通过视觉方式快速理解操作流程。
-
-#### 1. 总览
-
-![overview zh](./docs/screenshots/overview-zh.jpg)
-
-#### 2. 帮助信息
-
-![help](./docs/screenshots/tutorial-02-help.png)
-
-#### 3. 单 skill 安装
-
-![single](./docs/screenshots/tutorial-03-single-skill.png)
-
-#### 4. 多 skill 仓库导入
-
-![bundle](./docs/screenshots/tutorial-04-bundle-skill.png)
-
-#### 5. 共享链接验证
-
-![verify](./docs/screenshots/tutorial-05-verify.png)
-
----
-
-### 🔄 重新生成教程截图
-
-如果你调整了文档示例或想更新示意图，可以用这一节里的命令重新生成截图。
-
-```bash
-./scripts/regenerate-docs.sh
-```
-
----
-
 ### 📚 仓库内容
 
 这一节给维护者一个总览，方便快速找到脚本、状态文件和文档资源。
@@ -699,42 +663,6 @@ For future skills, the recommended workflow is:
 1. First keep the full source tree in the shared library instead of extracting only selected files
 2. Then expose it to each local AI client through symlinks
 3. When you add another client, update `client-roots.tsv` and run `--refresh-links`
-
----
-
-### 🖼️ Tutorial Screenshots
-
-This section contains tutorial screenshots so new users can understand the workflow visually.
-
-#### 1. Overview
-
-![overview en](./docs/screenshots/overview-en.jpg)
-
-#### 2. Help
-
-![help](./docs/screenshots/tutorial-02-help.png)
-
-#### 3. Single skill install
-
-![single](./docs/screenshots/tutorial-03-single-skill.png)
-
-#### 4. Multi-skill repository install
-
-![bundle](./docs/screenshots/tutorial-04-bundle-skill.png)
-
-#### 5. Shared link verification
-
-![verify](./docs/screenshots/tutorial-05-verify.png)
-
----
-
-### 🔄 Regenerate The Docs Screenshots
-
-If you update the docs examples or want to refresh the tutorial visuals, use this command to regenerate the screenshots.
-
-```bash
-./scripts/regenerate-docs.sh
-```
 
 ---
 
