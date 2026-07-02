@@ -12,6 +12,12 @@ A shared skill installer that stores GitHub or local skills in one shared librar
 
 如果你是第一次安装 `shared-skill-installer`，直接用默认位置即可，不需要先理解底层结构。
 
+标准中文口令：
+
+```text
+请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。请使用默认本地位置创建共享技能库，并自动接入我本地已安装的智能体客户端，共用这套共享技能库。
+```
+
 - 仓库地址：[https://github.com/SnooZou/shared-skill-installer](https://github.com/SnooZou/shared-skill-installer)
 - 默认共享技能库位置：
   - macOS / Linux：`~/AI-skills`
