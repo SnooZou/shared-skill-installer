@@ -81,13 +81,13 @@ Refresh every configured client link:
 
 ## Adding another client
 
-Edit `state/client-roots.tsv` and add one line:
+For user-facing requests, prefer a one-click natural-language prompt such as:
 
 ```text
-my-client	${HOME}/.my-client/skills
+请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...
 ```
 
-Then rebuild links:
+Under the hood, implement this by updating `state/client-roots.tsv`, then running:
 
 ```bash
 ./scripts/install-shared-skill --refresh-links
@@ -95,11 +95,13 @@ Then rebuild links:
 
 ## Invocation examples
 
-- `Use $shared-skill-installer to install this GitHub skill into my shared library.`
-- `Use $shared-skill-installer to import this local skill into the shared library and share it with all clients.`
-- `Use $shared-skill-installer to add TRAE to my shared clients and rebuild links.`
+- `Use $shared-skill-installer to install the GitHub skill I want into my shared skill library. The GitHub skill URL is: https://github.com/xxx/xxxx/...`
+- `Use $shared-skill-installer to import the local skill I want into my shared skill library and share it with all clients. My local skill path is: /xxx/xxxx/xxx...`
+- `Use $shared-skill-installer to import the multi-skill repository I want into my shared skill library. The GitHub repository URL is: https://github.com/xxx/xxxx/...`
+- `Use $shared-skill-installer to add another local AI client to my shared skill library setup and refresh all shared skill links. The new client name is: xxx . Its local skill root path is: /xxx/xxxx/...`
 - `Use $shared-skill-installer to verify whether this skill is active in every configured client.`
-- `请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库。`
-- `请使用 $shared-skill-installer，把这个本地 skill 完整入库到共享库并同步给所有客户端。`
-- `请使用 $shared-skill-installer，把 TRAE 加入共享客户端并重建所有入口。`
+- `请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。安装的 GitHub skill 地址为：https://github.com/xxx/xxxx/...`
+- `请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。我自己的本地 skill 存放路径为：/xxx/xxxx/xxx...`
+- `请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。安装的 GitHub 仓库地址为：https://github.com/xxx/xxxx/...`
+- `请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...`
 - `请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。`

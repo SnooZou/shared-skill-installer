@@ -81,19 +81,19 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 安装 GitHub skill：
 
 ```text
-请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意地址替换成你自己的 GitHub skill 地址：https://github.com/xxx/xxxx/...
+请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。安装的 GitHub skill 地址为：https://github.com/xxx/xxxx/...
 ```
 
 安装本地 skill：
 
 ```text
-请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意路径替换成你自己的本地 skill 路径：/xxx/xxxx/...
+请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。我自己的本地 skill 存放路径为：/xxx/xxxx/xxx...
 ```
 
 安装多 skill 仓库：
 
 ```text
-请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。请把下面这个示意路径替换成你自己的多 skill 仓库路径：/xxx/xxxx/...
+请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。安装的 GitHub 仓库地址为：https://github.com/xxx/xxxx/...
 ```
 
 验证是否生效：
@@ -129,19 +129,10 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 
 ### ➕ 新增本地智能体客户端
 
-如果你想把新的本地智能体也接入共享 skill 体系：
-
-1. 编辑 [`state/client-roots.tsv`](./state/client-roots.tsv)
-2. 新增一行：
+如果你想把新的本地智能体也接入共享 skill 体系，直接把下面这句发给智能体：
 
 ```text
-my-client	${HOME}/.my-client/skills
-```
-
-3. 刷新全部入口：
-
-```bash
-./scripts/install-shared-skill --refresh-links
+请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...
 ```
 
 ---
@@ -150,7 +141,7 @@ my-client	${HOME}/.my-client/skills
 
 - 新 skill 一律优先完整入库到共享库
 - 不要在每个智能体目录里各装一份
-- 新增客户端时，只改 `client-roots.tsv` 后执行一次 `--refresh-links`
+- 新增客户端时，优先直接使用新增客户端的一键式口令
 
 ---
 
@@ -229,19 +220,19 @@ Everything below assumes `shared-skill-installer` is already installed.
 Install a GitHub skill:
 
 ```text
-Use $shared-skill-installer to install the GitHub skill I want into my shared skill library and expose it to all local AI clients. Replace this example URL with your own GitHub skill URL: https://github.com/xxx/xxxx/...
+Use $shared-skill-installer to install the GitHub skill I want into my shared skill library and expose it to all local AI clients. The GitHub skill URL is: https://github.com/xxx/xxxx/...
 ```
 
 Install a local skill:
 
 ```text
-Use $shared-skill-installer to import the local skill I want into my shared skill library and expose it to all local AI clients. Replace this example path with your own local skill path: /xxx/xxxx/...
+Use $shared-skill-installer to import the local skill I want into my shared skill library and expose it to all local AI clients. My local skill path is: /xxx/xxxx/xxx...
 ```
 
 Install a multi-skill repository:
 
 ```text
-Use $shared-skill-installer to import the multi-skill repository I want into my shared skill library, then refresh all local AI client links. Replace this example path with your own multi-skill repository path: /xxx/xxxx/...
+Use $shared-skill-installer to import the multi-skill repository I want into my shared skill library, then refresh all local AI client links. The GitHub repository URL is: https://github.com/xxx/xxxx/...
 ```
 
 Verify that a shared skill is active:
@@ -277,19 +268,10 @@ Command-line fallback:
 
 ### ➕ Adding Another Local AI Client
 
-To connect another local AI client to the same shared skill system:
-
-1. Edit [`state/client-roots.tsv`](./state/client-roots.tsv)
-2. Add one line:
+To connect another local AI client to the same shared skill system, send this one-click prompt:
 
 ```text
-my-client	${HOME}/.my-client/skills
-```
-
-3. Refresh all links:
-
-```bash
-./scripts/install-shared-skill --refresh-links
+Use $shared-skill-installer to add another local AI client to my shared skill library setup and refresh all shared skill links. The new client name is: xxx . Its local skill root path is: /xxx/xxxx/...
 ```
 
 ---
@@ -298,4 +280,4 @@ my-client	${HOME}/.my-client/skills
 
 - Always import new skills into the shared library first
 - Do not install separate copies into every client folder
-- When you add another client, update `client-roots.tsv` and run `--refresh-links`
+- When you add another client, prefer the one-click client-onboarding prompt
