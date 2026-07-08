@@ -38,8 +38,9 @@ The actual install script also accepts overrides through environment variables s
 1. If this repository has not been initialized yet, treat first-run onboarding as a natural-language flow for the user, not a command-line lesson.
 2. If the user does not explicitly ask to customize the shared library location, use the default location.
 3. If the user wants to customize the shared library location, do not ask them to write shell syntax or environment variables. First offer a short plain-language choice such as:
-   - use the default location
-   - choose from common locations
+   - default location: `${HOME}/AI-skills`
+   - desktop
+   - documents
    - let me specify a location myself
 4. After the user chooses, run `scripts/bootstrap.sh` with the right defaults or `SHARED_ROOT`.
 5. Decide whether the source is:
@@ -109,6 +110,13 @@ For user-facing first-time install requests, prefer natural-language prompts suc
 - `请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。安装前请先让我选择共享技能库位置：使用默认位置、从常用位置里选一个，或者由我自己指定。确认后再自动完成安装，并接入我本地已安装的智能体客户端。`
 
 Unless the user explicitly asks for technical details, do not lead with raw shell commands like `git clone ...` or `SHARED_ROOT=... ./scripts/bootstrap.sh`.
+
+When the user asks to choose a custom location, prefer presenting concrete options in plain language first:
+
+- `默认位置（推荐）` -> `${HOME}/AI-skills`
+- `桌面` -> `${HOME}/Desktop/AI-skills`
+- `文稿 / Documents` -> `${HOME}/Documents/AI-skills`
+- `我自己指定` -> ask the user where they want it
 
 ## Invocation examples
 

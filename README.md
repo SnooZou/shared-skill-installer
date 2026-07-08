@@ -31,7 +31,12 @@ A shared skill installer that stores GitHub or local skills in one shared librar
 请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。安装前请先让我选择共享技能库位置：使用默认位置、从常用位置里选一个，或者由我自己指定。确认后再自动完成安装，并接入我本地已安装的智能体客户端。
 ```
 
-建议智能体先用中文给用户一个简短选择，而不是直接让用户填写路径写法。
+建议智能体先用中文给用户一个简短选择，而不是直接让用户填写路径写法。推荐提问方式：
+
+- `默认位置（推荐）`：`~/AI-skills`
+- `桌面`：在桌面创建共享技能库
+- `文档`：在“文稿 / Documents”里创建共享技能库
+- `我自己指定`：再让我补充位置
 
 安装完成后，重启 Codex、WorkBuddy、TRAE 等本地智能体客户端一次即可。
 
@@ -168,7 +173,12 @@ If you want a custom shared library location:
 Please help me install this repository: https://github.com/SnooZou/shared-skill-installer . Before installing, first let me choose where the shared skill library should live: use the default location, pick from common locations, or let me specify one myself. After that, automatically finish the installation and connect my locally installed AI clients.
 ```
 
-The AI client should offer a short plain-language choice first instead of making the user write path syntax.
+The AI client should offer a short plain-language choice first instead of making the user write path syntax. Recommended choices:
+
+- `Default location (Recommended)`: `~/AI-skills`
+- `Desktop`: create the shared library on the desktop
+- `Documents`: create the shared library inside Documents
+- `Let me choose`: ask me for a custom location
 
 After installation, restart Codex, WorkBuddy, TRAE, or any other local AI client once.
 
