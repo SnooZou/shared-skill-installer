@@ -129,11 +129,13 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 
 ### ➕ 新增本地智能体客户端
 
-如果你想把新的本地智能体也接入共享 skill 体系，直接把下面这句发给智能体：
+如果你想把新的本地智能体也接入共享 skill 体系，直接在已经接入共享库的任意一个智能体里发送下面这句：
 
 ```text
-请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...
+请使用 $shared-skill-installer，自动识别我本机已安装的、支持本地 skill 的智能体客户端，把它们统一接入我的共享技能库，并刷新所有共享 skill 入口。
 ```
+
+这句口令的目标是尽量不让用户自己去找路径。只有在某个客户端支持本地 skill、但又没有被自动识别时，才需要再补充它的名称和本地 skill 目录路径。
 
 ---
 
@@ -268,11 +270,13 @@ Command-line fallback:
 
 ### ➕ Adding Another Local AI Client
 
-To connect another local AI client to the same shared skill system, send this one-click prompt:
+To connect another local AI client to the same shared skill system, send this one-click prompt from any AI client that is already connected to the shared library:
 
 ```text
-Use $shared-skill-installer to add a new local AI client to my shared skill library system and refresh all shared skill entries. The new client name is: xxx . This client's local skill directory path is: /xxx/xxxx/...
+Use $shared-skill-installer to automatically detect the AI clients already installed on this machine that support local skill directories, connect them to my shared skill library, and refresh all shared skill entries.
 ```
+
+This prompt is designed to avoid making the user hunt for local paths. Only if a client supports local skills but is not detected automatically should you ask for its name and local skill directory path.
 
 ---
 

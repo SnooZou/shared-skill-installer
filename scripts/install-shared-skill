@@ -27,6 +27,7 @@ MAP_FILE=""
 usage() {
   cat <<'EOF'
 Usage:
+  install-shared-skill --auto-detect-clients [--dry-run]
   install-shared-skill --refresh-links [--dry-run]
   install-shared-skill --local /path/to/skill-root [--name skill-name] [--container-name folder-name] [--move-local] [--force] [--dry-run]
   install-shared-skill --bundle-local /path/to/repo-or-folder [--container-name folder-name] [--map-file skillmap.tsv] [--move-local] [--force] [--dry-run]
@@ -38,9 +39,11 @@ What it does now:
   2. Writes a skill map manifest under $SHARED_ROOT/.shared-skill-state
   3. Creates/updates symlink entries for every client root listed in $SHARED_ROOT/.shared-skill-state/client-roots.tsv
   4. Can refresh every configured client link from existing skill maps with --refresh-links
-  5. Skips Codex top-level links that would shadow a system skill (for example imagegen)
+  5. Can auto-detect common local AI clients and merge them into the shared client list
+  6. Skips Codex top-level links that would shadow a system skill (for example imagegen)
 
 Examples:
+  install-shared-skill --auto-detect-clients
   install-shared-skill --refresh-links
   install-shared-skill --local ~/Downloads/my-skill-repo
   install-shared-skill --bundle-local ~/Downloads/open-design --container-name open-design --map-file ./state/open-design.skillmap.tsv
@@ -110,12 +113,96 @@ emit_client_roots() {
   if [ -f "${CLIENT_ROOTS_FILE}" ]; then
     awk 'NF && $0 !~ /^[[:space:]]*#/' "${CLIENT_ROOTS_FILE}"
   else
-    cat <<EOF
-codex	${CODEX_ROOT}
-workbuddy	${WORKBUDDY_ROOT}
-trae	${TRAE_ROOT}
-EOF
+    candidate_client_roots
   fi
+}
+
+candidate_client_roots() {
+  local entries=()
+
+  [ -d "$(expand_path "${CODEX_ROOT}")" ] && entries+=("codex	${CODEX_ROOT}")
+  [ -d "$(expand_path "${WORKBUDDY_ROOT}")" ] && entries+=("workbuddy	${WORKBUDDY_ROOT}")
+  [ -d "$(expand_path "${TRAE_ROOT}")" ] && entries+=("trae	${TRAE_ROOT}")
+  [ -d "${HOME}/.trae-cn/skills" ] && entries+=("trae-cn	${HOME}/.trae-cn/skills")
+  [ -d "${HOME}/.claude/skills" ] && entries+=("claude	${HOME}/.claude/skills")
+  [ -d "${HOME}/.cursor/skills" ] && entries+=("cursor	${HOME}/.cursor/skills")
+  [ -d "${HOME}/.windsurf/skills" ] && entries+=("windsurf	${HOME}/.windsurf/skills")
+  [ -d "${HOME}/.roo/skills" ] && entries+=("roo	${HOME}/.roo/skills")
+
+  if [ "${#entries[@]}" -eq 0 ]; then
+    entries+=("codex	${CODEX_ROOT}")
+    entries+=("workbuddy	${WORKBUDDY_ROOT}")
+    entries+=("trae	${TRAE_ROOT}")
+  fi
+
+  printf '%s\n' "${entries[@]}"
+}
+
+merge_detected_client_roots() {
+  run_cmd mkdir -p "$STATE_ROOT"
+
+  local detected_file
+  detected_file="$(mktemp)"
+  candidate_client_roots > "$detected_file"
+
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    log "Would merge the following detected client roots into ${CLIENT_ROOTS_FILE}:"
+    cat "$detected_file"
+    rm -f "$detected_file"
+    return 0
+  fi
+
+  python3 - "${CLIENT_ROOTS_FILE}" "$detected_file" <<'PY'
+from pathlib import Path
+import sys
+
+client_roots = Path(sys.argv[1])
+detected_file = Path(sys.argv[2])
+
+existing = {}
+lines = []
+if client_roots.exists():
+    for raw in client_roots.read_text().splitlines():
+        lines.append(raw)
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        parts = raw.split("\t", 1)
+        if len(parts) == 2:
+            existing[parts[0].strip()] = parts[1].strip()
+
+detected = []
+for raw in detected_file.read_text().splitlines():
+    if not raw.strip():
+        continue
+    label, path = raw.split("\t", 1)
+    detected.append((label.strip(), path.strip()))
+
+if not lines:
+    lines.append("# label<TAB>skill_root_directory")
+
+changed = False
+for label, path in detected:
+    if existing.get(label) == path:
+        continue
+    if label in existing:
+        for idx, raw in enumerate(lines):
+            parts = raw.split("\t", 1)
+            if len(parts) == 2 and parts[0].strip() == label:
+                lines[idx] = f"{label}\t{path}"
+                changed = True
+                break
+    else:
+        lines.append(f"{label}\t{path}")
+        changed = True
+
+client_roots.parent.mkdir(parents=True, exist_ok=True)
+client_roots.write_text("\n".join(lines).rstrip() + "\n")
+print("changed=1" if changed else "changed=0")
+PY
+
+  rm -f "$detected_file"
+  log "Updated detected client roots in ${CLIENT_ROOTS_FILE}"
 }
 
 default_container_name() {
@@ -351,6 +438,11 @@ refresh_all_links() {
   fi
 }
 
+auto_detect_clients() {
+  merge_detected_client_roots
+  refresh_all_links
+}
+
 install_from_local() {
   validate_skill_dir "$LOCAL_PATH"
 
@@ -480,6 +572,10 @@ while [ "$#" -gt 0 ]; do
       SOURCE_MODE="refresh-links"
       shift
       ;;
+    --auto-detect-clients)
+      SOURCE_MODE="auto-detect-clients"
+      shift
+      ;;
     --bundle-local)
       SOURCE_MODE="bundle-local"
       LOCAL_BUNDLE_PATH="${2:-}"
@@ -550,6 +646,8 @@ elif [ "$SOURCE_MODE" = "bundle-local" ]; then
   install_from_local_bundle
 elif [ "$SOURCE_MODE" = "refresh-links" ]; then
   refresh_all_links
+elif [ "$SOURCE_MODE" = "auto-detect-clients" ]; then
+  auto_detect_clients
 else
   install_from_github
 fi

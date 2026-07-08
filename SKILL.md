@@ -42,7 +42,7 @@ The actual install script also accepts overrides through environment variables s
    - a GitHub repo/path or GitHub URL
 3. Use the installer with the matching mode.
 4. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
-5. If a new client root was added, run `scripts/install-shared-skill --refresh-links`.
+5. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
 
 ## Install modes
 
@@ -84,24 +84,26 @@ Refresh every configured client link:
 For user-facing requests, prefer a one-click natural-language prompt such as:
 
 ```text
-请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...
+请使用 $shared-skill-installer，自动识别我本机已安装的、支持本地 skill 的智能体客户端，把它们统一接入我的共享技能库，并刷新所有共享 skill 入口。
 ```
 
-Under the hood, implement this by updating `state/client-roots.tsv`, then running:
+Under the hood, implement this by running:
 
 ```bash
-./scripts/install-shared-skill --refresh-links
+./scripts/install-shared-skill --auto-detect-clients
 ```
+
+If auto-detection misses a client that the user knows is installed, ask for that client's name and local skill directory path, then append it to `state/client-roots.tsv` and run `./scripts/install-shared-skill --refresh-links`.
 
 ## Invocation examples
 
 - `Use $shared-skill-installer to fully install the GitHub skill I want into my shared skill library and sync it to all local AI clients. The GitHub skill URL is: https://github.com/xxx/xxxx/...`
 - `Use $shared-skill-installer to fully import the local skill I want into my shared skill library and sync it to all local AI clients. My local skill path is: /xxx/xxxx/xxx...`
 - `Use $shared-skill-installer to fully import the multi-skill repository I want into my shared skill library and refresh all local AI client entries. The GitHub repository URL is: https://github.com/xxx/xxxx/...`
-- `Use $shared-skill-installer to add a new local AI client to my shared skill library system and refresh all shared skill entries. The new client name is: xxx . This client's local skill directory path is: /xxx/xxxx/...`
+- `Use $shared-skill-installer to automatically detect the AI clients already installed on this machine that support local skill directories, connect them to my shared skill library, and refresh all shared skill entries.`
 - `Use $shared-skill-installer to verify whether this skill is active in every configured client.`
 - `请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。安装的 GitHub skill 地址为：https://github.com/xxx/xxxx/...`
 - `请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。我自己的本地 skill 存放路径为：/xxx/xxxx/xxx...`
 - `请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。安装的 GitHub 仓库地址为：https://github.com/xxx/xxxx/...`
-- `请使用 $shared-skill-installer，把新的本地智能体客户端加入我的共享技能库体系，并刷新所有共享 skill 入口。新客户端名称为：xxx 。这个客户端的本地 skill 目录路径为：/xxx/xxxx/...`
+- `请使用 $shared-skill-installer，自动识别我本机已安装的、支持本地 skill 的智能体客户端，把它们统一接入我的共享技能库，并刷新所有共享 skill 入口。`
 - `请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。`
