@@ -23,19 +23,15 @@ A shared skill installer that stores GitHub or local skills in one shared librar
   - macOS / Linux：`~/AI-skills`
   - Windows：`%USERPROFILE%\\AI-skills`
 
-首次自动安装：
-
-```bash
-git clone https://github.com/SnooZou/shared-skill-installer.git
-cd shared-skill-installer
-./scripts/bootstrap.sh
-```
+上面这句中文口令已经够用，普通用户不需要理解命令行安装步骤。
 
 如果你想自定义共享库位置：
 
-```bash
-SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
+```text
+请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。安装前请先让我选择共享技能库位置：使用默认位置、从常用位置里选一个，或者由我自己指定。确认后再自动完成安装，并接入我本地已安装的智能体客户端。
 ```
+
+建议智能体先用中文给用户一个简短选择，而不是直接让用户填写路径写法。
 
 安装完成后，重启 Codex、WorkBuddy、TRAE 等本地智能体客户端一次即可。
 
@@ -164,19 +160,15 @@ Please help me install this repository: https://github.com/SnooZou/shared-skill-
   - macOS / Linux: `~/AI-skills`
   - Windows: `%USERPROFILE%\\AI-skills`
 
-First-time install:
-
-```bash
-git clone https://github.com/SnooZou/shared-skill-installer.git
-cd shared-skill-installer
-./scripts/bootstrap.sh
-```
+The prompt above is enough for most users. They do not need to understand the command-line bootstrap flow.
 
 If you want a custom shared library location:
 
-```bash
-SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
+```text
+Please help me install this repository: https://github.com/SnooZou/shared-skill-installer . Before installing, first let me choose where the shared skill library should live: use the default location, pick from common locations, or let me specify one myself. After that, automatically finish the installation and connect my locally installed AI clients.
 ```
+
+The AI client should offer a short plain-language choice first instead of making the user write path syntax.
 
 After installation, restart Codex, WorkBuddy, TRAE, or any other local AI client once.
 

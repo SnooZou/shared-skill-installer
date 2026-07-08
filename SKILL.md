@@ -35,14 +35,20 @@ The actual install script also accepts overrides through environment variables s
 
 ## Standard workflow
 
-1. If this repository has not been initialized yet, run `scripts/bootstrap.sh`.
-2. Decide whether the source is:
+1. If this repository has not been initialized yet, treat first-run onboarding as a natural-language flow for the user, not a command-line lesson.
+2. If the user does not explicitly ask to customize the shared library location, use the default location.
+3. If the user wants to customize the shared library location, do not ask them to write shell syntax or environment variables. First offer a short plain-language choice such as:
+   - use the default location
+   - choose from common locations
+   - let me specify a location myself
+4. After the user chooses, run `scripts/bootstrap.sh` with the right defaults or `SHARED_ROOT`.
+5. Decide whether the source is:
    - a single local skill
    - a multi-skill local repository
    - a GitHub repo/path or GitHub URL
-3. Use the installer with the matching mode.
-4. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
-5. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
+6. Use the installer with the matching mode.
+7. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
+8. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
 
 ## Install modes
 
@@ -94,6 +100,15 @@ Under the hood, implement this by running:
 ```
 
 If auto-detection misses a client that the user knows is installed, ask for that client's name and local skill directory path, then append it to `state/client-roots.tsv` and run `./scripts/install-shared-skill --refresh-links`.
+
+## First-time install phrasing
+
+For user-facing first-time install requests, prefer natural-language prompts such as:
+
+- `请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。请使用默认本地位置创建共享技能库，并自动接入我本地已安装的智能体客户端，共用这套共享技能库。`
+- `请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。安装前请先让我选择共享技能库位置：使用默认位置、从常用位置里选一个，或者由我自己指定。确认后再自动完成安装，并接入我本地已安装的智能体客户端。`
+
+Unless the user explicitly asks for technical details, do not lead with raw shell commands like `git clone ...` or `SHARED_ROOT=... ./scripts/bootstrap.sh`.
 
 ## Invocation examples
 
