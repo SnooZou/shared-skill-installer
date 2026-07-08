@@ -81,19 +81,19 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 安装 GitHub skill：
 
 ```text
-请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用：https://github.com/owner/repo/tree/main/path/to/skill
+请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意地址替换成你自己的 GitHub skill 地址：https://github.com/xxx/xxxx/tree/main/your-skill-path
 ```
 
 安装本地 skill：
 
 ```text
-请使用 $shared-skill-installer，把这个本地 skill 完整入库到 AI-skills，并让 Codex、WorkBuddy、TRAE 共用：/path/to/skill
+请使用 $shared-skill-installer，把这个本地 skill 完整入库到 AI-skills，并让 Codex、WorkBuddy、TRAE 共用。请把下面这个示意路径替换成你自己的本地 skill 路径：/path/to/your-local-skill
 ```
 
 安装多 skill 仓库：
 
 ```text
-请使用 $shared-skill-installer，把这个多 skill 仓库完整导入共享库，容器名叫 open-design，并刷新所有客户端入口：/path/to/open-design
+请使用 $shared-skill-installer，把这个多 skill 仓库完整导入共享库，并刷新所有客户端入口。请把下面这个示意路径替换成你自己的多 skill 仓库路径：/path/to/your-multi-skill-repo 。容器名默认沿用仓库或文件夹本身名称，如需自定义我会再单独说明。
 ```
 
 验证是否生效：
@@ -113,16 +113,16 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 
 常见场景：
 
-- GitHub skill：发 GitHub skill 链接给智能体
-- 本地 skill：发本地路径给智能体
-- 多 skill 仓库：发仓库路径，并指定容器名
+- GitHub skill：发你自己的 GitHub skill 链接给智能体
+- 本地 skill：发你自己的本地路径给智能体
+- 多 skill 仓库：发你自己的仓库路径给智能体；容器名默认沿用仓库或文件夹名称，无需先写死
 
 命令行备用方式：
 
 ```bash
-./scripts/run-install.sh --repo owner/repo --path path/to/skill
-./scripts/run-install.sh --local /path/to/skill-root
-./scripts/run-install.sh --bundle-local /path/to/open-design --container-name open-design --map-file ./state/open-design.skillmap.tsv
+./scripts/run-install.sh --repo xxx/xxxx --path your-skill-path
+./scripts/run-install.sh --local /path/to/your-local-skill
+./scripts/run-install.sh --bundle-local /path/to/your-multi-skill-repo
 ```
 
 ---
@@ -229,19 +229,19 @@ Everything below assumes `shared-skill-installer` is already installed.
 Install a GitHub skill:
 
 ```text
-Use $shared-skill-installer to install this GitHub skill into my shared skill library and expose it to all local AI clients: https://github.com/owner/repo/tree/main/path/to/skill
+Use $shared-skill-installer to install this GitHub skill into my shared skill library and expose it to all local AI clients. Replace this example URL with your own GitHub skill URL: https://github.com/xxx/xxxx/tree/main/your-skill-path
 ```
 
 Install a local skill:
 
 ```text
-Use $shared-skill-installer to import this local skill into AI-skills and share it with Codex, WorkBuddy, and TRAE: /path/to/skill
+Use $shared-skill-installer to import this local skill into AI-skills and share it with Codex, WorkBuddy, and TRAE. Replace this example path with your own local skill path: /path/to/your-local-skill
 ```
 
 Install a multi-skill repository:
 
 ```text
-Use $shared-skill-installer to import this multi-skill repository into the shared library under the container name open-design, then refresh all client links: /path/to/open-design
+Use $shared-skill-installer to import this multi-skill repository into the shared library, then refresh all client links. Replace this example path with your own multi-skill repository path: /path/to/your-multi-skill-repo . The container name usually follows the repo or folder name unless you explicitly want to override it.
 ```
 
 Verify that a shared skill is active:
@@ -261,16 +261,16 @@ Once `shared-skill-installer` is installed, every new skill follows the same rul
 
 Common cases:
 
-- GitHub skill: send the GitHub skill URL to your AI client
-- Local skill: send the local folder path
-- Multi-skill repository: send the repo path and specify a container name
+- GitHub skill: send your own GitHub skill URL to the AI client
+- Local skill: send your own local folder path
+- Multi-skill repository: send your own repo path; the container name usually follows the repo or folder name by default
 
 Command-line fallback:
 
 ```bash
-./scripts/run-install.sh --repo owner/repo --path path/to/skill
-./scripts/run-install.sh --local /path/to/skill-root
-./scripts/run-install.sh --bundle-local /path/to/open-design --container-name open-design --map-file ./state/open-design.skillmap.tsv
+./scripts/run-install.sh --repo xxx/xxxx --path your-skill-path
+./scripts/run-install.sh --local /path/to/your-local-skill
+./scripts/run-install.sh --bundle-local /path/to/your-multi-skill-repo
 ```
 
 ---
