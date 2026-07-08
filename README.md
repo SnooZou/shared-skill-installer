@@ -87,13 +87,13 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 安装本地 skill：
 
 ```text
-请使用 $shared-skill-installer，把这个本地 skill 完整入库到 AI-skills，并让 Codex、WorkBuddy、TRAE 共用。请把下面这个示意路径替换成你自己的本地 skill 路径：/path/to/your-local-skill
+请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意路径替换成你自己的本地 skill 路径：/xxx/xxxx/...
 ```
 
 安装多 skill 仓库：
 
 ```text
-请使用 $shared-skill-installer，把这个多 skill 仓库完整导入共享库，并刷新所有客户端入口。请把下面这个示意路径替换成你自己的多 skill 仓库路径：/path/to/your-multi-skill-repo 。容器名默认沿用仓库或文件夹本身名称，如需自定义我会再单独说明。
+请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。请把下面这个示意路径替换成你自己的多 skill 仓库路径：/xxx/xxxx/...
 ```
 
 验证是否生效：
@@ -235,13 +235,13 @@ Use $shared-skill-installer to install the GitHub skill I want into my shared sk
 Install a local skill:
 
 ```text
-Use $shared-skill-installer to import this local skill into AI-skills and share it with Codex, WorkBuddy, and TRAE. Replace this example path with your own local skill path: /path/to/your-local-skill
+Use $shared-skill-installer to import the local skill I want into my shared skill library and expose it to all local AI clients. Replace this example path with your own local skill path: /xxx/xxxx/...
 ```
 
 Install a multi-skill repository:
 
 ```text
-Use $shared-skill-installer to import this multi-skill repository into the shared library, then refresh all client links. Replace this example path with your own multi-skill repository path: /path/to/your-multi-skill-repo . The container name usually follows the repo or folder name unless you explicitly want to override it.
+Use $shared-skill-installer to import the multi-skill repository I want into my shared skill library, then refresh all local AI client links. Replace this example path with your own multi-skill repository path: /xxx/xxxx/...
 ```
 
 Verify that a shared skill is active:
