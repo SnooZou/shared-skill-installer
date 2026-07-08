@@ -81,7 +81,7 @@ SHARED_ROOT=/your/path/AI-skills ./scripts/bootstrap.sh
 安装 GitHub skill：
 
 ```text
-请使用 $shared-skill-installer，把这个 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意地址替换成你自己的 GitHub skill 地址：https://github.com/xxx/xxxx/tree/main/your-skill-path
+请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。请把下面这个示意地址替换成你自己的 GitHub skill 地址：https://github.com/xxx/xxxx/...
 ```
 
 安装本地 skill：
@@ -229,7 +229,7 @@ Everything below assumes `shared-skill-installer` is already installed.
 Install a GitHub skill:
 
 ```text
-Use $shared-skill-installer to install this GitHub skill into my shared skill library and expose it to all local AI clients. Replace this example URL with your own GitHub skill URL: https://github.com/xxx/xxxx/tree/main/your-skill-path
+Use $shared-skill-installer to install the GitHub skill I want into my shared skill library and expose it to all local AI clients. Replace this example URL with your own GitHub skill URL: https://github.com/xxx/xxxx/...
 ```
 
 Install a local skill:
