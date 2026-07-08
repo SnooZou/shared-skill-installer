@@ -95,10 +95,10 @@ Under the hood, implement this by updating `state/client-roots.tsv`, then runnin
 
 ## Invocation examples
 
-- `Use $shared-skill-installer to install the GitHub skill I want into my shared skill library. The GitHub skill URL is: https://github.com/xxx/xxxx/...`
-- `Use $shared-skill-installer to import the local skill I want into my shared skill library and share it with all clients. My local skill path is: /xxx/xxxx/xxx...`
-- `Use $shared-skill-installer to import the multi-skill repository I want into my shared skill library. The GitHub repository URL is: https://github.com/xxx/xxxx/...`
-- `Use $shared-skill-installer to add another local AI client to my shared skill library setup and refresh all shared skill links. The new client name is: xxx . Its local skill root path is: /xxx/xxxx/...`
+- `Use $shared-skill-installer to fully install the GitHub skill I want into my shared skill library and sync it to all local AI clients. The GitHub skill URL is: https://github.com/xxx/xxxx/...`
+- `Use $shared-skill-installer to fully import the local skill I want into my shared skill library and sync it to all local AI clients. My local skill path is: /xxx/xxxx/xxx...`
+- `Use $shared-skill-installer to fully import the multi-skill repository I want into my shared skill library and refresh all local AI client entries. The GitHub repository URL is: https://github.com/xxx/xxxx/...`
+- `Use $shared-skill-installer to add a new local AI client to my shared skill library system and refresh all shared skill entries. The new client name is: xxx . This client's local skill directory path is: /xxx/xxxx/...`
 - `Use $shared-skill-installer to verify whether this skill is active in every configured client.`
 - `请使用 $shared-skill-installer，把你要安装的 GitHub skill 完整安装到我的共享技能库，并同步给所有本地智能体使用。安装的 GitHub skill 地址为：https://github.com/xxx/xxxx/...`
 - `请使用 $shared-skill-installer，把你要安装的本地 skill 完整入库到我的共享技能库，并同步给所有本地智能体使用。我自己的本地 skill 存放路径为：/xxx/xxxx/xxx...`
