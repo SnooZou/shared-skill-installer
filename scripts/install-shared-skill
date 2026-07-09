@@ -2,13 +2,17 @@
 
 set -euo pipefail
 
-SHARED_ROOT="${SHARED_ROOT:-${HOME}/AI-skills}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CONFIG_SCRIPT="${SCRIPT_DIR}/shared-library-config.py"
+SHARED_ROOT="${SHARED_ROOT:-$(python3 "${CONFIG_SCRIPT}" --get-root)}"
 CODEX_ROOT="${CODEX_ROOT:-${HOME}/.codex/skills}"
 WORKBUDDY_ROOT="${WORKBUDDY_ROOT:-${HOME}/.workbuddy/skills}"
 TRAE_ROOT="${TRAE_ROOT:-${HOME}/.trae/skills}"
 STATE_ROOT="${STATE_ROOT:-${SHARED_ROOT}/.shared-skill-state}"
 BACKUP_ROOT="${BACKUP_ROOT:-${SHARED_ROOT}/.install-backups}"
 CLIENT_ROOTS_FILE="${CLIENT_ROOTS_FILE:-${STATE_ROOT}/client-roots.tsv}"
+PACKAGE_ROOT="${PACKAGE_ROOT:-${SHARED_ROOT}/shared-skill-installer}"
+DRY_RUN_STATE_ROOT=""
 
 FORCE=0
 DRY_RUN=0
@@ -28,6 +32,8 @@ usage() {
   cat <<'EOF'
 Usage:
   install-shared-skill --auto-detect-clients [--dry-run]
+  install-shared-skill --adopt-existing [--dry-run]
+  install-shared-skill --reconcile-library [--dry-run]
   install-shared-skill --refresh-links [--dry-run]
   install-shared-skill --local /path/to/skill-root [--name skill-name] [--container-name folder-name] [--move-local] [--force] [--dry-run]
   install-shared-skill --bundle-local /path/to/repo-or-folder [--container-name folder-name] [--map-file skillmap.tsv] [--move-local] [--force] [--dry-run]
@@ -40,7 +46,8 @@ What it does now:
   3. Creates/updates symlink entries for every client root listed in $SHARED_ROOT/.shared-skill-state/client-roots.tsv
   4. Can refresh every configured client link from existing skill maps with --refresh-links
   5. Can auto-detect common local AI clients and merge them into the shared client list
-  6. Skips Codex top-level links that would shadow a system skill (for example imagegen)
+  6. Can adopt existing local skills already living under $SHARED_ROOT but missing state registration
+  7. Skips Codex top-level links that would shadow a system skill (for example imagegen)
 
 Examples:
   install-shared-skill --auto-detect-clients
@@ -59,6 +66,31 @@ die() {
 
 log() {
   echo "[install-shared-skill] $*"
+}
+
+ensure_dry_run_state_root() {
+  if [ "${DRY_RUN}" -ne 1 ]; then
+    return 0
+  fi
+
+  DRY_RUN_STATE_ROOT="${TMPDIR:-/tmp}/shared-skill-installer-state.$$"
+  mkdir -p "${DRY_RUN_STATE_ROOT}"
+
+  if [ -d "${STATE_ROOT}" ]; then
+    find "${STATE_ROOT}" -maxdepth 1 -type f \( -name '*.skillmap.tsv' -o -name 'client-roots.tsv' \) -print0 \
+      | while IFS= read -r -d '' file; do
+          cp "$file" "${DRY_RUN_STATE_ROOT}/"
+        done
+  fi
+}
+
+active_state_root() {
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    ensure_dry_run_state_root
+    printf '%s\n' "${DRY_RUN_STATE_ROOT}"
+  else
+    printf '%s\n' "${STATE_ROOT}"
+  fi
 }
 
 run_cmd() {
@@ -210,6 +242,32 @@ default_container_name() {
   basename "$path"
 }
 
+read_skill_name() {
+  python3 - "$1" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+skill_dir = Path(sys.argv[1])
+skill_file = skill_dir / "SKILL.md"
+name = skill_dir.name
+if skill_file.exists():
+    text = skill_file.read_text(errors="ignore")
+    frontmatter = re.match(r"^---\n(.*?)\n---\n", text, re.S)
+    if frontmatter:
+        for line in frontmatter.group(1).splitlines():
+            if ":" not in line:
+                continue
+            key, value = line.split(":", 1)
+            if key.strip() == "name":
+                parsed = value.strip().strip('"').strip("'")
+                if parsed:
+                    name = parsed
+                break
+print(name)
+PY
+}
+
 ensure_container_slot() {
   local container="$1"
   local dest="${SHARED_ROOT}/${container}"
@@ -299,7 +357,7 @@ scan_skill_map() {
 
   local dir name rel
   while IFS= read -r dir; do
-    name="$(basename "$dir")"
+    name="$(read_skill_name "$dir")"
     if grep -qxF "$name" "$seen_names_file"; then
       log "Skipped duplicate skill name ${name}: ${dir}"
       continue
@@ -332,9 +390,11 @@ write_skill_map() {
   local container="$1"
   local repo_root="$2"
   local map_mode="$3"
-  local output_file="${STATE_ROOT}/${container}.skillmap.tsv"
+  local state_root
+  state_root="$(active_state_root)"
+  local output_file="${state_root}/${container}.skillmap.tsv"
 
-  run_cmd mkdir -p "$STATE_ROOT"
+  run_cmd mkdir -p "$state_root"
 
   if [ "$map_mode" = "scan" ]; then
     scan_skill_map "$repo_root" "$output_file"
@@ -350,15 +410,93 @@ write_skill_map() {
 copy_skill_map_file() {
   local container="$1"
   local src_map="$2"
-  local dest_map="${STATE_ROOT}/${container}.skillmap.tsv"
+  local state_root
+  state_root="$(active_state_root)"
+  local dest_map="${state_root}/${container}.skillmap.tsv"
   [ -f "$src_map" ] || die "Skill map not found: $src_map"
-  run_cmd mkdir -p "$STATE_ROOT"
+  run_cmd mkdir -p "$state_root"
   if [ "${DRY_RUN}" -eq 1 ]; then
     log "Would copy skill map ${src_map} -> ${dest_map}"
   else
     cp "$src_map" "$dest_map"
     log "Copied skill map: ${dest_map}"
   fi
+}
+
+build_manager_snapshot() {
+  local builder="${PACKAGE_ROOT}/scripts/build-shared-library-manager.sh"
+  if [ ! -f "${builder}" ]; then
+    return 0
+  fi
+
+  if [ "${DRY_RUN}" -eq 1 ]; then
+    log "Would rebuild Shared Library Manager data"
+    return 0
+  fi
+
+  SHARED_ROOT="${SHARED_ROOT}" PACKAGE_ROOT="${PACKAGE_ROOT}" "${builder}" >/dev/null
+  log "Rebuilt Shared Library Manager data"
+}
+
+contains_skill_files() {
+  local root="$1"
+  find "$root" \
+    \( -type d \( -name .git -o -name node_modules -o -name .next -o -name .tmp -o -name dist -o -name build \) -prune \) -o \
+    \( -type f -name SKILL.md -print -quit \) \
+    | grep -q .
+}
+
+adopt_existing_skills() {
+  local state_root
+  state_root="$(active_state_root)"
+  run_cmd mkdir -p "$state_root"
+  local seen_skill_names
+  seen_skill_names="$(mktemp)"
+  : > "$seen_skill_names"
+
+  find "$state_root" -maxdepth 1 -type f -name '*.skillmap.tsv' -print0 \
+    | while IFS= read -r -d '' map_file; do
+        awk -F '\t' 'NF { print $1 }' "$map_file"
+      done | sort -u > "$seen_skill_names"
+
+  local child container map_path skill_name
+  for child in "${SHARED_ROOT}"/*; do
+    [ -d "${child}" ] || continue
+    container="$(basename "${child}")"
+    case "${container}" in
+      .shared-skill-state|.install-backups|bin) continue ;;
+      .*) continue ;;
+    esac
+
+    map_path="${state_root}/${container}.skillmap.tsv"
+    if [ -f "${map_path}" ]; then
+      continue
+    fi
+
+    if [ -f "${child}/SKILL.md" ]; then
+      skill_name="$(read_skill_name "${child}")"
+      if grep -qxF "${skill_name}" "${seen_skill_names}"; then
+        log "Skipped adoption for ${container} because skill name already exists: ${skill_name}"
+        continue
+      fi
+      write_skill_map "${container}" "${child}" "single" "${child}" "${skill_name}"
+      printf '%s\n' "${skill_name}" >> "${seen_skill_names}"
+      sort -u -o "${seen_skill_names}" "${seen_skill_names}"
+      log "Adopted existing single-skill directory: ${container}"
+      continue
+    fi
+
+    if contains_skill_files "${child}"; then
+      write_skill_map "${container}" "${child}" "scan"
+      if [ -f "${map_path}" ]; then
+        awk -F '\t' 'NF { print $1 }' "${map_path}" >> "${seen_skill_names}"
+        sort -u -o "${seen_skill_names}" "${seen_skill_names}"
+      fi
+      log "Adopted existing multi-skill directory: ${container}"
+    fi
+  done
+
+  rm -f "${seen_skill_names}"
 }
 
 ensure_client_link() {
@@ -397,14 +535,20 @@ ensure_client_link() {
 
 link_from_map() {
   local container="$1"
-  local map_file="${2:-${STATE_ROOT}/${container}.skillmap.tsv}"
+  local state_root
+  state_root="$(active_state_root)"
+  local map_file="${2:-${state_root}/${container}.skillmap.tsv}"
   local repo_root="${SHARED_ROOT}/${container}"
   [ -f "$map_file" ] || die "Skill map not found: ${map_file}"
 
   local name rel target client_name client_root
   while IFS=$'\t' read -r name rel; do
     [ -n "$name" ] || continue
-    target="${repo_root}/${rel}"
+    if [ "$rel" = "." ]; then
+      target="${repo_root}"
+    else
+      target="${repo_root}/${rel}"
+    fi
     if [ "${DRY_RUN}" -ne 1 ] && [ ! -d "$target" ]; then
       die "Skill target missing for ${name}: ${target}"
     fi
@@ -418,7 +562,10 @@ link_from_map() {
 }
 
 refresh_all_links() {
-  run_cmd mkdir -p "$STATE_ROOT"
+  local state_root
+  state_root="$(active_state_root)"
+  run_cmd mkdir -p "$state_root"
+  adopt_existing_skills
 
   local found=0
   local map_file container
@@ -428,7 +575,7 @@ refresh_all_links() {
     found=1
     link_from_map "$container" "$map_file"
   done < <(
-    find "$STATE_ROOT" -maxdepth 1 -type f -name '*.skillmap.tsv' \
+    find "$state_root" -maxdepth 1 -type f -name '*.skillmap.tsv' \
       ! -name '*-preview.skillmap.tsv' \
       | sort
   )
@@ -436,9 +583,21 @@ refresh_all_links() {
   if [ "$found" -eq 0 ]; then
     die "No skill maps found under ${STATE_ROOT}"
   fi
+
+  build_manager_snapshot
 }
 
 auto_detect_clients() {
+  merge_detected_client_roots
+  refresh_all_links
+}
+
+adopt_existing_and_refresh() {
+  adopt_existing_skills
+  refresh_all_links
+}
+
+reconcile_library() {
   merge_detected_client_roots
   refresh_all_links
 }
@@ -457,7 +616,7 @@ install_from_local() {
   if [ -n "$DEST_NAME" ]; then
     skill_name="$DEST_NAME"
   else
-    skill_name="$(basename "$LOCAL_PATH")"
+    skill_name="$(read_skill_name "$LOCAL_PATH")"
   fi
 
   preserve_local_tree "$LOCAL_PATH" "$container"
@@ -467,6 +626,7 @@ install_from_local() {
     write_skill_map "$container" "${SHARED_ROOT}/${container}" "single" "${SHARED_ROOT}/${container}" "$skill_name"
   fi
   link_from_map "$container"
+  build_manager_snapshot
 }
 
 install_from_local_bundle() {
@@ -493,6 +653,7 @@ install_from_local_bundle() {
     write_skill_map "$container" "${SHARED_ROOT}/${container}" "scan"
   fi
   link_from_map "$container"
+  build_manager_snapshot
 }
 
 install_from_github() {
@@ -547,7 +708,7 @@ install_from_github() {
     if [ -n "$DEST_NAME" ]; then
       skill_name="$DEST_NAME"
     else
-      skill_name="$(basename "$skill_dir")"
+      skill_name="$(read_skill_name "$skill_dir")"
     fi
     write_skill_map "$container" "$repo_root" "single" "$skill_dir" "$skill_name"
   elif [ -n "$MAP_FILE" ]; then
@@ -559,6 +720,7 @@ install_from_github() {
   fi
 
   link_from_map "$container"
+  build_manager_snapshot
 }
 
 while [ "$#" -gt 0 ]; do
@@ -574,6 +736,14 @@ while [ "$#" -gt 0 ]; do
       ;;
     --auto-detect-clients)
       SOURCE_MODE="auto-detect-clients"
+      shift
+      ;;
+    --adopt-existing)
+      SOURCE_MODE="adopt-existing"
+      shift
+      ;;
+    --reconcile-library)
+      SOURCE_MODE="reconcile-library"
       shift
       ;;
     --bundle-local)
@@ -648,6 +818,10 @@ elif [ "$SOURCE_MODE" = "refresh-links" ]; then
   refresh_all_links
 elif [ "$SOURCE_MODE" = "auto-detect-clients" ]; then
   auto_detect_clients
+elif [ "$SOURCE_MODE" = "adopt-existing" ]; then
+  adopt_existing_and_refresh
+elif [ "$SOURCE_MODE" = "reconcile-library" ]; then
+  reconcile_library
 else
   install_from_github
 fi

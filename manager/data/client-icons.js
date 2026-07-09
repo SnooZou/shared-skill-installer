@@ -1,0 +1,1 @@
+window.SHARED_LIBRARY_CLIENT_ICONS = {};

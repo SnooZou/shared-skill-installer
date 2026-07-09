@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shared Library Manager</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar__brand">
+          <div class="sidebar__eyebrow" id="brand-eyebrow">Shared Library</div>
+          <h1 class="sidebar__title" id="brand-title">Skill Manager</h1>
+          <p class="sidebar__subtitle" id="brand-subtitle">共享技能库可视化管理器</p>
+          <div class="sidebar__brandbar">
+            <span class="brand-badge" id="brand-version">V1.2.0</span>
+            <a
+              class="brand-icon-link"
+              id="brand-repo-link"
+              href="https://github.com/SnooZou/shared-skill-installer"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Open GitHub repository"
+              title="Open GitHub repository"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 .5C5.65.5.5 5.7.5 12.13c0 5.15 3.3 9.52 7.88 11.06.58.11.79-.26.79-.57 0-.28-.01-1.21-.02-2.19-3.21.71-3.89-1.38-3.89-1.38-.52-1.35-1.28-1.71-1.28-1.71-1.05-.73.08-.72.08-.72 1.16.08 1.77 1.21 1.77 1.21 1.03 1.79 2.71 1.27 3.37.97.1-.76.4-1.27.73-1.56-2.56-.3-5.25-1.31-5.25-5.82 0-1.29.46-2.34 1.2-3.16-.12-.3-.52-1.51.12-3.15 0 0 .99-.32 3.24 1.21A11.17 11.17 0 0 1 12 6.1c.98 0 1.97.14 2.9.42 2.24-1.53 3.22-1.21 3.22-1.21.65 1.64.25 2.85.12 3.15.75.82 1.2 1.87 1.2 3.16 0 4.52-2.69 5.51-5.26 5.81.42.37.78 1.09.78 2.21 0 1.6-.01 2.89-.01 3.28 0 .32.2.69.8.57 4.57-1.54 7.86-5.91 7.86-11.06C23.5 5.7 18.35.5 12 .5Z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <nav class="sidebar__nav" id="sidebar-nav"></nav>
+
+        <div class="sidebar__footer" id="sidebar-footer"></div>
+      </aside>
+
+      <main class="app-main">
+        <header class="page-header">
+          <div class="page-header__copy">
+            <div class="page-header__crumb" id="page-crumb">Overview / Shared Library</div>
+            <h2 id="page-title">Shared Library Manager</h2>
+            <p id="page-subtitle">依托 shared-skill-installer 的状态文件，查看共享库规模、客户端链接状态、仓库来源与更新风险。</p>
+          </div>
+          <div class="page-header__controls">
+            <div class="toolbar-controls">
+              <div class="segmented">
+                <button class="segmented__button" id="theme-dark-btn" type="button">Dark</button>
+                <button class="segmented__button" id="theme-light-btn" type="button">Light</button>
+              </div>
+              <div class="segmented">
+                <button class="segmented__button" id="lang-zh-btn" type="button">中文</button>
+                <button class="segmented__button" id="lang-en-btn" type="button">EN</button>
+              </div>
+            </div>
+          </div>
+          <div class="page-header__meta" id="header-meta"></div>
+        </header>
+
+        <div class="notice-slot" id="app-notice" hidden></div>
+
+        <section class="hero-grid">
+          <div class="hero-summary">
+            <div class="hero-summary__glow"></div>
+            <div class="hero-summary__content">
+              <p class="hero-summary__eyebrow" id="hero-eyebrow">Library Health</p>
+              <div class="hero-summary__main" id="hero-main"></div>
+              <div class="hero-summary__stats" id="stats"></div>
+            </div>
+          </div>
+
+          <div class="client-panel">
+            <div class="panel-head">
+              <div>
+                <h3 id="clients-title">Connected Clients</h3>
+                <p id="clients-subtitle">当前已纳入共享体系的本地智能体客户端</p>
+              </div>
+            </div>
+            <div class="client-list" id="clients"></div>
+          </div>
+        </section>
+
+        <section class="workspace-shell">
+          <div class="workspace-toolbar">
+            <div class="searchbox">
+              <svg class="searchbox__icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M11 5a6 6 0 1 0 0 12a6 6 0 0 0 0-12Zm0-2a8 8 0 1 1 4.9 14.3l4.4 4.4l-1.4 1.4l-4.4-4.4A8 8 0 0 1 11 3Z"
+                  fill="currentColor"
+                />
+              </svg>
+              <input id="search-input" type="search" placeholder="搜索容器名、skill 名、功能简介" />
+            </div>
+
+            <div class="filter-pills" id="filter-pills"></div>
+
+            <label class="sortbox">
+              <span id="sort-label">排序</span>
+              <select id="sort-select">
+                <option value="attention">按关注度</option>
+                <option value="size">按体积</option>
+                <option value="count">按 skill 数量</option>
+                <option value="name">按名称</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="workspace-grid">
+            <section class="list-pane">
+              <div class="panel-head panel-head--tight">
+                <div>
+                  <h3 id="list-title">Shared Containers</h3>
+                  <p id="list-summary">按容器查看共享库内容</p>
+                </div>
+              </div>
+              <div class="container-list" id="containers"></div>
+            </section>
+
+            <aside class="detail-pane">
+              <div class="panel-head panel-head--tight">
+                <div>
+                  <h3 id="detail-title">Container Detail</h3>
+                  <p id="detail-subtitle">查看选中容器的来源、状态和 skill 清单</p>
+                </div>
+              </div>
+              <div class="detail-pane__body" id="detail-pane"></div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./data/library-state.js"></script>
+    <script src="./data/client-icons.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -4,9 +4,35 @@
 
 A shared skill installer that stores GitHub or local skills in one shared library, then exposes them to multiple local AI clients.
 
+Current integrated release: `V1.2.0`
+
+V1.2.0 adds three important upgrades:
+
+- automatic adoption of older local skills that already exist in `AI-skills` but were never registered into shared state
+- shared-library reconciliation that can repair missing client links while refreshing the full library
+- duplicate skill-name detection that prevents older stray folders from hijacking an existing shared entry
+- a bundled `Shared Library Manager` local dashboard inside the skill package itself
+
 ---
 
 ## 中文说明
+
+### 🆕 V1.2.0 这次修了什么
+
+- 旧的本地 skill 如果已经在 `AI-skills` 里，但没写进 `.shared-skill-state/*.skillmap.tsv`，现在可以被自动纳管
+- 刷新共享库时，会顺带修复缺失的客户端入口，而不是只处理已登记 skill
+- 如果旧目录里存在和正式 skill 同名的重复项，`V1.2.0` 会识别并跳过这类冲突纳管，避免抢占现有入口
+- 技能包里正式内置了 `Shared Library Manager` 可视化管理台，不再只是独立原型
+- 技能管理台左上角加入版本号与 GitHub 仓库跳转图标，方便查看当前版本和来源
+- 管理台里为“未登记本地 skill”提供了单独入口，不会再被埋在普通列表里
+- 管理台会优先从本机已安装客户端的官方应用包里提取图标并本地引用，后续新增 Cursor、Claude 等客户端也沿用这套机制
+
+常用的 `V1.2.0` 维护命令：
+
+```bash
+./scripts/install-shared-skill --reconcile-library
+./scripts/open-shared-library-manager.sh
+```
 
 ### ⚡ 新手快速开始
 
@@ -145,10 +171,44 @@ A shared skill installer that stores GitHub or local skills in one shared librar
 - 新 skill 一律优先完整入库到共享库
 - 不要在每个智能体目录里各装一份
 - 新增客户端时，优先直接使用新增客户端的一键式口令
+- 如果你机器里已经有一批旧 skill，升级到 `V1.2.0` 后先执行一次共享库重整流程
+
+### 🖥 Shared Library Manager
+
+`V1.2.0` 开始，这个技能包里自带本地可视化管理台。
+
+- 本地入口：`manager/index.html`
+- 刷新数据：`./scripts/build-shared-library-manager.sh`
+- 一键准备并打开入口路径：`./scripts/open-shared-library-manager.sh`
+- 客户端图标提取：`./scripts/extract-client-icons.py`
+
+它会显示：
+
+- 当前共享库里有哪些 skill / 仓库
+- 哪些是正式登记项，哪些是未登记但已存在的本地 skill
+- 管理台可直接按“未登记”筛选这些本地 skill
+- Codex、WorkBuddy、TRAE 等客户端是否全部接好入口
+- 已安装客户端如果本机存在官方应用图标，管理台会优先使用提取后的本地图标
+- 哪些仓库可能有更新，哪些 skill 缺少客户端链接
 
 ---
 
 ## English Guide
+
+### 🆕 What V1.2.0 Fixes
+
+- Older local skills already living in `AI-skills` can now be adopted even if they were never registered into `.shared-skill-state/*.skillmap.tsv`
+- Library refresh can now repair missing client links instead of only handling already indexed skills
+- Duplicate skill names are now detected so an older stray folder does not silently overwrite an existing shared entry point
+- The package now bundles the `Shared Library Manager` dashboard directly
+- The dashboard sidebar now shows the package version and a GitHub repository shortcut icon
+
+Common V1.2.0 maintenance commands:
+
+```bash
+./scripts/install-shared-skill --reconcile-library
+./scripts/open-shared-library-manager.sh
+```
 
 ### ⚡ Quick Start
 

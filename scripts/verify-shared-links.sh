@@ -3,7 +3,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-CLIENTS_FILE="${ROOT}/state/client-roots.tsv"
+CONFIG_SCRIPT="${ROOT}/scripts/shared-library-config.py"
+SHARED_ROOT="${SHARED_ROOT:-$(python3 "${CONFIG_SCRIPT}" --get-root)}"
+CLIENTS_FILE="${CLIENTS_FILE:-${SHARED_ROOT}/.shared-skill-state/client-roots.tsv}"
 
 expand_path() {
   python3 - "$1" <<'PY'

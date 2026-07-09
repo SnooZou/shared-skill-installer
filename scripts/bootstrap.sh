@@ -3,7 +3,8 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SHARED_ROOT="${SHARED_ROOT:-${HOME}/AI-skills}"
+CONFIG_SCRIPT="${REPO_ROOT}/scripts/shared-library-config.py"
+SHARED_ROOT="${SHARED_ROOT:-$(python3 "${CONFIG_SCRIPT}" --get-root)}"
 STATE_ROOT="${SHARED_ROOT}/.shared-skill-state"
 PACKAGE_DEST="${SHARED_ROOT}/shared-skill-installer"
 
@@ -46,13 +47,16 @@ for _, expanded in rows:
     Path(expanded).mkdir(parents=True, exist_ok=True)
 PY
 
-SHARED_ROOT="${SHARED_ROOT}" "${SHARED_ROOT}/bin/install-shared-skill" --refresh-links
+SHARED_ROOT="${SHARED_ROOT}" PACKAGE_ROOT="${PACKAGE_DEST}" "${SHARED_ROOT}/bin/install-shared-skill" --reconcile-library
+python3 "${CONFIG_SCRIPT}" --set-root "${SHARED_ROOT}" >/dev/null
 
 cat <<EOF
 Bootstrap complete.
 Shared library: ${SHARED_ROOT}
 Skill package:   ${PACKAGE_DEST}
 Client roots:    ${STATE_ROOT}/client-roots.tsv
+Manager UI:      ${PACKAGE_DEST}/manager/index.html
+Manager server:  ${PACKAGE_DEST}/scripts/open-shared-library-manager.sh
 
 Restart local clients if they do not hot-reload the new skill.
 EOF
