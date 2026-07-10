@@ -115,23 +115,67 @@ def parse_skill_frontmatter(skill_dir: Path) -> dict[str, str]:
         return {}
 
     meta: dict[str, str] = {}
-    for line in frontmatter.group(1).splitlines():
-        if ":" not in line:
+    lines = frontmatter.group(1).splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not line.strip() or line.startswith((" ", "\t")) or ":" not in line:
+            i += 1
             continue
+
         key, value = line.split(":", 1)
-        meta[key.strip()] = value.strip().strip('"').strip("'")
+        key = key.strip()
+        value = value.strip()
+
+        if value in {">", "|", ">-", "|-", ">+", "|+"}:
+            block_lines: list[str] = []
+            i += 1
+            while i < len(lines):
+                block_line = lines[i]
+                if not block_line.strip():
+                    block_lines.append("")
+                    i += 1
+                    continue
+                if not block_line.startswith((" ", "\t")):
+                    break
+                block_lines.append(block_line.lstrip())
+                i += 1
+
+            if value.startswith(">"):
+                parsed = " ".join(part.strip() for part in block_lines if part.strip())
+            else:
+                parsed = "\n".join(part.rstrip() for part in block_lines).strip()
+            meta[key] = parsed
+            continue
+
+        meta[key] = value.strip('"').strip("'")
+        i += 1
     return meta
+
+
+def normalize_description_text(value: str) -> str:
+    text = re.sub(r"\s+", " ", value or "").strip()
+    return text[:240]
+
+
+def sanitize_body_line(line: str) -> str:
+    line = line.strip()
+    if not line or line.startswith(("#", "---", "```")):
+        return ""
+    if re.fullmatch(r"[>|:\-\s|]+", line):
+        return ""
+    line = re.sub(r"^>\s*", "", line)
+    line = re.sub(r"^[-*+]\s*", "", line)
+    return normalize_description_text(line)
 
 
 def first_body_line(skill_file: Path) -> str:
     text = skill_file.read_text(errors="ignore")
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     for line in lines:
-        if line.startswith("#"):
-            continue
-        if line.startswith("---"):
-            continue
-        return line[:240]
+        cleaned = sanitize_body_line(line)
+        if cleaned:
+            return cleaned
     return ""
 
 
@@ -146,9 +190,9 @@ def read_skill_descriptions(skill_dir: Path) -> dict[str, str]:
         return {"default": "", "zh": "", "en": ""}
 
     meta = parse_skill_frontmatter(skill_dir)
-    default = meta.get("description") or first_body_line(skill_file)
-    zh = meta.get("zh_description") or meta.get("description_zh") or default
-    en = meta.get("en_description") or meta.get("description_en") or default
+    default = normalize_description_text(meta.get("description") or first_body_line(skill_file))
+    zh = normalize_description_text(meta.get("zh_description") or meta.get("description_zh") or default)
+    en = normalize_description_text(meta.get("en_description") or meta.get("description_en") or default)
     return {"default": default, "zh": zh, "en": en}
 
 
