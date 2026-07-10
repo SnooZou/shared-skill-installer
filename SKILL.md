@@ -59,7 +59,7 @@ The actual install script also accepts overrides through environment variables s
 6. Use the installer with the matching mode.
 7. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
 8. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
-9. In `V1.2.0`, if the user has older skills already sitting in `AI-skills`, prefer `scripts/install-shared-skill --reconcile-library` so the installer can adopt them into shared state and repair missing client links.
+9. In `V1.2.1`, if the user has older skills already sitting in `AI-skills`, prefer `scripts/install-shared-skill --reconcile-library` so the installer can adopt them into shared state and repair missing client links.
 
 ## Install modes
 

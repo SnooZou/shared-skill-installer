@@ -1,6 +1,6 @@
 # Shared Library Manager
 
-`Shared Library Manager` is now bundled into `shared-skill-installer V1.2.0`.
+`Shared Library Manager` is now bundled into `shared-skill-installer V1.2.1`.
 
 It is the local visual dashboard for the shared skill library workflow.
 
@@ -55,12 +55,13 @@ Or use:
 
 That command refreshes the dashboard data and prints the local HTML entry path.
 
-## Why V1.2.0 matters
+## Why V1.2.1 matters
 
-Before `V1.2.0`, the visual layer could miss older local skills that physically existed in `AI-skills` but had never been registered into the shared state files.
+Before the `V1.2.x` shared-library manager updates, the visual layer could miss older local skills that physically existed in `AI-skills` but had never been registered into the shared state files.
 
-`V1.2.0` fixes that at the installer level:
+`V1.2.1` keeps that installer-level fix and adds a more stable skill-description parser:
 
 - `install-shared-skill --reconcile-library` can auto-adopt older local skill folders
 - missing client links can be repaired during the same reconciliation pass
 - the dashboard can now display indexed and unindexed entries more truthfully
+- multiline `SKILL.md` frontmatter descriptions no longer degrade into placeholder symbols such as `>` or `|`

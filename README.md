@@ -4,9 +4,9 @@
 
 A shared skill installer that stores GitHub or local skills in one shared library, then exposes them to multiple local AI clients.
 
-Current integrated release: `V1.2.0`
+Current integrated release: `V1.2.1`
 
-V1.2.0 adds three important upgrades:
+V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one important stabilization fix:
 
 - automatic adoption of older local skills that already exist in `AI-skills` but were never registered into shared state
 - shared-library reconciliation that can repair missing client links while refreshing the full library
@@ -17,17 +17,18 @@ V1.2.0 adds three important upgrades:
 
 ## 中文说明
 
-### 🆕 V1.2.0 这次修了什么
+### 🆕 V1.2.1 这次修了什么
 
 - 旧的本地 skill 如果已经在 `AI-skills` 里，但没写进 `.shared-skill-state/*.skillmap.tsv`，现在可以被自动纳管
 - 刷新共享库时，会顺带修复缺失的客户端入口，而不是只处理已登记 skill
-- 如果旧目录里存在和正式 skill 同名的重复项，`V1.2.0` 会识别并跳过这类冲突纳管，避免抢占现有入口
+- 如果旧目录里存在和正式 skill 同名的重复项，`V1.2.1` 会识别并跳过这类冲突纳管，避免抢占现有入口
 - 技能包里正式内置了 `Shared Library Manager` 可视化管理台，不再只是独立原型
 - 技能管理台左上角加入版本号与 GitHub 仓库跳转图标，方便查看当前版本和来源
 - 管理台里为“未登记本地 skill”提供了单独入口，不会再被埋在普通列表里
 - 管理台会优先从本机已安装客户端的官方应用包里提取图标并本地引用，后续新增 Cursor、Claude 等客户端也沿用这套机制
+- 修复 `SKILL.md` 多行 frontmatter 描述被错误显示为 `>` 或 `|` 的问题，技能介绍读取更稳定
 
-常用的 `V1.2.0` 维护命令：
+常用的 `V1.2.1` 维护命令：
 
 ```bash
 ./scripts/install-shared-skill --reconcile-library
@@ -171,11 +172,11 @@ V1.2.0 adds three important upgrades:
 - 新 skill 一律优先完整入库到共享库
 - 不要在每个智能体目录里各装一份
 - 新增客户端时，优先直接使用新增客户端的一键式口令
-- 如果你机器里已经有一批旧 skill，升级到 `V1.2.0` 后先执行一次共享库重整流程
+- 如果你机器里已经有一批旧 skill，升级到 `V1.2.1` 后先执行一次共享库重整流程
 
 ### 🖥 Shared Library Manager
 
-`V1.2.0` 开始，这个技能包里自带本地可视化管理台。
+`V1.2.1` 继续内置本地可视化管理台，并保留 `V1.2.0` 的历史归档版本。
 
 - 本地入口：`manager/index.html`
 - 刷新数据：`./scripts/build-shared-library-manager.sh`
@@ -195,7 +196,7 @@ V1.2.0 adds three important upgrades:
 
 ## English Guide
 
-### 🆕 What V1.2.0 Fixes
+### 🆕 What V1.2.1 Fixes
 
 - Older local skills already living in `AI-skills` can now be adopted even if they were never registered into `.shared-skill-state/*.skillmap.tsv`
 - Library refresh can now repair missing client links instead of only handling already indexed skills
@@ -203,7 +204,7 @@ V1.2.0 adds three important upgrades:
 - The package now bundles the `Shared Library Manager` dashboard directly
 - The dashboard sidebar now shows the package version and a GitHub repository shortcut icon
 
-Common V1.2.0 maintenance commands:
+Common V1.2.1 maintenance commands:
 
 ```bash
 ./scripts/install-shared-skill --reconcile-library

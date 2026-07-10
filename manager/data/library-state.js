@@ -4,7 +4,7 @@ window.SHARED_LIBRARY_STATE = {
   "state_root": "~/AI-skills/.shared-skill-state",
   "package_meta": {
     "name": "shared-skill-installer",
-    "version": "V1.2.0",
+    "version": "V1.2.1",
     "repo_url": "https://github.com/SnooZou/shared-skill-installer"
   },
   "clients": [],
