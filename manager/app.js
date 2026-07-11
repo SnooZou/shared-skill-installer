@@ -14,7 +14,7 @@ const UI_STATE = {
 };
 
 const APP_META = {
-  version: "V1.2.1",
+  version: "V1.3.0",
   repoUrl: "https://github.com/SnooZou/shared-skill-installer",
 };
 const CLIENT_ICON_MANIFEST = window.SHARED_LIBRARY_CLIENT_ICONS || {};

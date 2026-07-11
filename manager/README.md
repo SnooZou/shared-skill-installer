@@ -1,6 +1,6 @@
 # Shared Library Manager
 
-`Shared Library Manager` is now bundled into `shared-skill-installer V1.2.1`.
+`Shared Library Manager` is now bundled into `shared-skill-installer V1.3.0`.
 
 It is the local visual dashboard for the shared skill library workflow.
 
@@ -53,15 +53,28 @@ Or use:
 ./scripts/open-shared-library-manager.sh
 ```
 
-That command refreshes the dashboard data and prints the local HTML entry path.
+On macOS, that command now prefers opening a faux local app shell:
 
-## Why V1.2.1 matters
+```bash
+./scripts/build-shared-library-manager-app.sh
+```
 
-Before the `V1.2.x` shared-library manager updates, the visual layer could miss older local skills that physically existed in `AI-skills` but had never been registered into the shared state files.
+By default it builds:
 
-`V1.2.1` keeps that installer-level fix and adds a more stable skill-description parser:
+```text
+~/Applications/Shared Library Manager.app
+```
+
+That shell app still renders the local web manager, but gives the user a stable “local app” entry point after the first install.
+
+## Why V1.3.0 matters
+
+Before the `V1.3.0` local-app-shell update, users could lose track of how to reopen the manager after closing the browser window once.
+
+`V1.3.0` keeps the installer-level fixes and adds a more stable re-entry path:
 
 - `install-shared-skill --reconcile-library` can auto-adopt older local skill folders
 - missing client links can be repaired during the same reconciliation pass
 - the dashboard can now display indexed and unindexed entries more truthfully
 - multiline `SKILL.md` frontmatter descriptions no longer degrade into placeholder symbols such as `>` or `|`
+- the manager can now be reopened through a local app shell instead of relying on the user to remember a browser URL

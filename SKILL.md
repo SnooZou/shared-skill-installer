@@ -35,6 +35,7 @@ The actual install script also accepts overrides through environment variables s
 - `scripts/regenerate-docs.sh`: rebuild tutorial screenshots
 - `scripts/export-shared-library-state.py`: export dashboard data for the bundled manager
 - `scripts/build-shared-library-manager.sh`: refresh the bundled dashboard data
+- `scripts/build-shared-library-manager-app.sh`: build the macOS local app-shell wrapper for the manager
 - `scripts/extract-client-icons.py`: extract official app icons from local AI client app bundles into the bundled manager assets
 - `scripts/open-shared-library-manager.sh`: rebuild the dashboard data and return the local entry page
 - `state/client-roots.tsv`: shared client configuration
@@ -59,7 +60,8 @@ The actual install script also accepts overrides through environment variables s
 6. Use the installer with the matching mode.
 7. Verify the result with `scripts/verify-shared-links.sh <skill-name>` or with `readlink`.
 8. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
-9. In `V1.2.1`, if the user has older skills already sitting in `AI-skills`, prefer `scripts/install-shared-skill --reconcile-library` so the installer can adopt them into shared state and repair missing client links.
+9. In `V1.3.0`, if the user has older skills already sitting in `AI-skills`, prefer `scripts/install-shared-skill --reconcile-library` so the installer can adopt them into shared state and repair missing client links.
+10. On macOS, bootstrap should automatically build `~/Applications/Shared Library Manager.app` so the user has a stable re-entry point that feels like a local app.
 
 ## Install modes
 
@@ -106,6 +108,12 @@ Open the bundled Shared Library Manager:
 
 ```bash
 ./scripts/open-shared-library-manager.sh
+```
+
+Build the macOS app-shell wrapper explicitly:
+
+```bash
+./scripts/build-shared-library-manager-app.sh
 ```
 
 Refresh bundled manager data and local official client icons:
@@ -158,3 +166,4 @@ When the user asks to choose a custom location, prefer presenting concrete optio
 - `请使用 $shared-skill-installer，把你要安装的多 skill 仓库完整导入我的共享技能库，并刷新所有本地智能体入口。安装的 GitHub 仓库地址为：https://github.com/xxx/xxxx/...`
 - `请使用 $shared-skill-installer，自动识别我本机已安装的、支持本地 skill 的智能体客户端，把它们统一接入我的共享技能库，并刷新所有共享 skill 入口。`
 - `请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。`
+- `请使用 $shared-skill-installer，打开我的共享技能库管理台。`

@@ -7,6 +7,7 @@ CONFIG_SCRIPT="${REPO_ROOT}/scripts/shared-library-config.py"
 SHARED_ROOT="${SHARED_ROOT:-$(python3 "${CONFIG_SCRIPT}" --get-root)}"
 STATE_ROOT="${SHARED_ROOT}/.shared-skill-state"
 PACKAGE_DEST="${SHARED_ROOT}/shared-skill-installer"
+MANAGER_APP_PATH=""
 
 copy_if_missing() {
   local src="$1"
@@ -50,6 +51,14 @@ PY
 SHARED_ROOT="${SHARED_ROOT}" PACKAGE_ROOT="${PACKAGE_DEST}" "${SHARED_ROOT}/bin/install-shared-skill" --reconcile-library
 python3 "${CONFIG_SCRIPT}" --set-root "${SHARED_ROOT}" >/dev/null
 
+if [ "$(uname -s)" = "Darwin" ] && [ -x "${PACKAGE_DEST}/scripts/build-shared-library-manager-app.sh" ]; then
+  if MANAGER_APP_PATH="$("${PACKAGE_DEST}/scripts/build-shared-library-manager-app.sh" --print-path --quiet 2>/dev/null | tail -n 1)"; then
+    :
+  else
+    MANAGER_APP_PATH=""
+  fi
+fi
+
 cat <<EOF
 Bootstrap complete.
 Shared library: ${SHARED_ROOT}
@@ -57,6 +66,7 @@ Skill package:   ${PACKAGE_DEST}
 Client roots:    ${STATE_ROOT}/client-roots.tsv
 Manager UI:      ${PACKAGE_DEST}/manager/index.html
 Manager server:  ${PACKAGE_DEST}/scripts/open-shared-library-manager.sh
+Manager app:     ${MANAGER_APP_PATH:-Not built}
 
 Restart local clients if they do not hot-reload the new skill.
 EOF

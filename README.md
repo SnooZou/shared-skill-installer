@@ -4,9 +4,9 @@
 
 A shared skill installer that stores GitHub or local skills in one shared library, then exposes them to multiple local AI clients.
 
-Current integrated release: `V1.2.1`
+Current integrated release: `V1.3.0`
 
-V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one important stabilization fix:
+V1.3.0 keeps the V1.2.x shared-library and manager upgrades, and adds a local app-shell entry for the manager:
 
 - automatic adoption of older local skills that already exist in `AI-skills` but were never registered into shared state
 - shared-library reconciliation that can repair missing client links while refreshing the full library
@@ -17,18 +17,20 @@ V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one import
 
 ## 中文说明
 
-### 🆕 V1.2.1 这次修了什么
+### 🆕 V1.3.0 这次修了什么
 
 - 旧的本地 skill 如果已经在 `AI-skills` 里，但没写进 `.shared-skill-state/*.skillmap.tsv`，现在可以被自动纳管
 - 刷新共享库时，会顺带修复缺失的客户端入口，而不是只处理已登记 skill
-- 如果旧目录里存在和正式 skill 同名的重复项，`V1.2.1` 会识别并跳过这类冲突纳管，避免抢占现有入口
+- 如果旧目录里存在和正式 skill 同名的重复项，`V1.3.0` 会识别并跳过这类冲突纳管，避免抢占现有入口
 - 技能包里正式内置了 `Shared Library Manager` 可视化管理台，不再只是独立原型
 - 技能管理台左上角加入版本号与 GitHub 仓库跳转图标，方便查看当前版本和来源
 - 管理台里为“未登记本地 skill”提供了单独入口，不会再被埋在普通列表里
 - 管理台会优先从本机已安装客户端的官方应用包里提取图标并本地引用，后续新增 Cursor、Claude 等客户端也沿用这套机制
 - 修复 `SKILL.md` 多行 frontmatter 描述被错误显示为 `>` 或 `|` 的问题，技能介绍读取更稳定
+- macOS 首次安装后会自动生成 `Shared Library Manager.app`，用户以后可以像打开本地应用一样重新进入管理台
+- 管理台脚本现在会优先打开这个本地壳应用，找不到时再回退到浏览器模式
 
-常用的 `V1.2.1` 维护命令：
+常用的 `V1.3.0` 维护命令：
 
 ```bash
 ./scripts/install-shared-skill --reconcile-library
@@ -172,15 +174,17 @@ V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one import
 - 新 skill 一律优先完整入库到共享库
 - 不要在每个智能体目录里各装一份
 - 新增客户端时，优先直接使用新增客户端的一键式口令
-- 如果你机器里已经有一批旧 skill，升级到 `V1.2.1` 后先执行一次共享库重整流程
+- 如果你机器里已经有一批旧 skill，升级到 `V1.3.0` 后先执行一次共享库重整流程
 
 ### 🖥 Shared Library Manager
 
-`V1.2.1` 继续内置本地可视化管理台，并保留 `V1.2.0` 的历史归档版本。
+`V1.3.0` 继续内置本地可视化管理台，并把它封装成可重开的本地壳应用入口。
 
 - 本地入口：`manager/index.html`
 - 刷新数据：`./scripts/build-shared-library-manager.sh`
 - 一键准备并打开入口路径：`./scripts/open-shared-library-manager.sh`
+- macOS 假本地应用：`~/Applications/Shared Library Manager.app`
+- 构建壳应用：`./scripts/build-shared-library-manager-app.sh`
 - 客户端图标提取：`./scripts/extract-client-icons.py`
 
 它会显示：
@@ -196,7 +200,7 @@ V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one import
 
 ## English Guide
 
-### 🆕 What V1.2.1 Fixes
+### 🆕 What V1.3.0 Fixes
 
 - Older local skills already living in `AI-skills` can now be adopted even if they were never registered into `.shared-skill-state/*.skillmap.tsv`
 - Library refresh can now repair missing client links instead of only handling already indexed skills
@@ -204,7 +208,7 @@ V1.2.1 keeps the V1.2.0 shared-library and manager upgrades, and adds one import
 - The package now bundles the `Shared Library Manager` dashboard directly
 - The dashboard sidebar now shows the package version and a GitHub repository shortcut icon
 
-Common V1.2.1 maintenance commands:
+Common V1.3.0 maintenance commands:
 
 ```bash
 ./scripts/install-shared-skill --reconcile-library
