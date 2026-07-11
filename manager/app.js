@@ -431,6 +431,11 @@ function summaryMetric(label, value, tone = "") {
   `;
 }
 
+function pathText(value, cls = "") {
+  const extra = cls ? ` ${cls}` : "";
+  return `<span class="path-text${extra}" title="${escapeHtml(value || "—")}">${escapeHtml(value || "—")}</span>`;
+}
+
 function clientIconMarkup(value, suffix = "") {
   const key = clientKey(value);
   const officialIcon = CLIENT_ICON_MANIFEST[key]?.path;
@@ -618,11 +623,11 @@ function renderSidebar(state, containers) {
   document.getElementById("sidebar-footer").innerHTML = `
     <div class="footer-card">
       <div class="footer-card__label">${escapeHtml(t("sidebarSelected"))}</div>
-      <div class="footer-card__value">${escapeHtml(selected?.name || "—")}</div>
+      <div class="footer-card__value footer-card__value--strong">${escapeHtml(selected?.name || "—")}</div>
     </div>
     <div class="footer-card">
       <div class="footer-card__label">${escapeHtml(t("sidebarRoot"))}</div>
-      <div class="footer-card__value">${escapeHtml(state.shared_root)}</div>
+      <div class="footer-card__value footer-card__value--mono">${pathText(state.shared_root, "path-text--compact")}</div>
     </div>
   `;
 }
@@ -638,11 +643,11 @@ function renderHeader(state) {
             : ""
         }
       </div>
-      <span class="header-meta__value">${escapeHtml(state.shared_root)}</span>
+      <span class="header-meta__value header-meta__value--mono">${pathText(state.shared_root)}</span>
     </div>
     <div class="header-meta__row">
       <span class="header-meta__label">${escapeHtml(t("metaState"))}</span>
-      <span class="header-meta__value">${escapeHtml(state.state_root)}</span>
+      <span class="header-meta__value header-meta__value--mono">${pathText(state.state_root)}</span>
     </div>
     <div class="header-meta__row">
       <span class="header-meta__label">${escapeHtml(t("metaScan"))}</span>
@@ -698,7 +703,7 @@ function renderClients(state) {
             ${clientIconMarkup(client.label, index)}
             <div>
               <div class="client-row__name">${escapeHtml(formatClientLabel(client.label))}</div>
-              <div class="client-row__path">${escapeHtml(client.path)}</div>
+              <div class="client-row__path">${pathText(client.path)}</div>
             </div>
           </div>
           <div>${badge(t("clientConnected"), "ok")}</div>
@@ -765,7 +770,7 @@ function renderContainerList(state, containers) {
               <div class="container-item__top">
                 <div>
                   <div class="container-item__name">${escapeHtml(container.name)}</div>
-                  <div class="container-item__path">${escapeHtml(container.path)}</div>
+                  <div class="container-item__path">${pathText(container.path)}</div>
                 </div>
                 ${badge(
                   statusText(container),
@@ -854,7 +859,7 @@ function renderDetail(state) {
     <section class="detail-grid">
       <div class="detail-card">
         <div class="detail-card__label">${escapeHtml(t("detailRemote"))}</div>
-        <div class="detail-card__value">${escapeHtml(git.remote_url || t("detailUnknownNonGit"))}</div>
+        <div class="detail-card__value detail-card__value--mono">${pathText(git.remote_url || t("detailUnknownNonGit"))}</div>
       </div>
       <div class="detail-card">
         <div class="detail-card__label">${escapeHtml(t("detailSize"))}</div>
@@ -870,11 +875,11 @@ function renderDetail(state) {
       </div>
       <div class="detail-card">
         <div class="detail-card__label">${escapeHtml(t("detailCommit"))}</div>
-        <div class="detail-card__value">${escapeHtml(git.head_commit || t("detailUnknown"))}</div>
+        <div class="detail-card__value detail-card__value--mono">${escapeHtml(git.head_commit || t("detailUnknown"))}</div>
       </div>
       <div class="detail-card">
         <div class="detail-card__label">${escapeHtml(t("detailPath"))}</div>
-        <div class="detail-card__value">${escapeHtml(selected.path)}</div>
+        <div class="detail-card__value detail-card__value--mono">${pathText(selected.path)}</div>
       </div>
       ${
         selected.duplicate_count > 0
@@ -900,7 +905,7 @@ function renderDetail(state) {
                 <div class="skill-row__head">
                   <div>
                     <div class="skill-row__name">${escapeHtml(skill.name)}</div>
-                    <div class="skill-row__path">${escapeHtml(skill.relative_path)}</div>
+                    <div class="skill-row__path">${pathText(skill.relative_path, "path-text--compact")}</div>
                   </div>
                   <div class="status-row">${badge(
                     t("detailLinkedRatio", skill.linked_clients, skill.expected_clients),
