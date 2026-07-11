@@ -16,6 +16,7 @@ let webViewRef = null;
 let serverTaskRef = null;
 let activeSharedRoot = null;
 let controllerRef = null;
+let cacheBuster = String(Date.now());
 
 function unwrap(value) {
   return ObjC.unwrap(value);
@@ -42,6 +43,29 @@ function appendTextFile(path, text) {
 
 function debugLog(message) {
   appendTextFile(DEBUG_LOG_PATH, (new Date()).toISOString() + ' ' + message + '\n');
+}
+
+function runCommand(launchPath, args) {
+  const task = $.NSTask.alloc.init;
+  task.setLaunchPath($(launchPath));
+  task.setArguments(args);
+  const pipe = $.NSPipe.pipe;
+  task.setStandardOutput(pipe);
+  task.setStandardError(pipe);
+  try {
+    task.launch;
+    task.waitUntilExit;
+    const data = pipe.fileHandleForReading.readDataToEndOfFile;
+    return {
+      status: task.terminationStatus,
+      output: unwrap($.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding)) || '',
+    };
+  } catch (error) {
+    return {
+      status: 1,
+      output: String(error),
+    };
+  }
 }
 
 function readSharedRoot() {
@@ -85,7 +109,7 @@ function pythonExecutable() {
 }
 
 function managerURL() {
-  return 'http://' + HOST + ':' + PORT + '/';
+  return 'http://' + HOST + ':' + PORT + '/?ts=' + cacheBuster;
 }
 
 function managerRequest() {
@@ -154,6 +178,27 @@ function startServerTask() {
   }
 }
 
+function stopExistingServerOnPort() {
+  const lsof = '/usr/sbin/lsof';
+  const kill = '/bin/kill';
+  if (!fileExists(lsof) || !fileExists(kill)) {
+    return;
+  }
+  const lookup = runCommand(lsof, ['-ti', 'tcp:' + PORT, '-sTCP:LISTEN']);
+  if (lookup.status !== 0 || !lookup.output.trim()) {
+    debugLog('no stale server found on port ' + PORT);
+    return;
+  }
+  const pids = lookup.output
+    .split(/\s+/)
+    .map((value) => value.trim())
+    .filter(Boolean);
+  for (const pid of pids) {
+    debugLog('terminating stale server pid=' + pid);
+    runCommand(kill, ['-TERM', pid]);
+  }
+}
+
 function prepareWindow(controller) {
   const windowStyle =
     $.NSWindowStyleMaskTitled |
@@ -214,6 +259,8 @@ function boot() {
   activeSharedRoot = readSharedRoot();
   debugLog('shared root=' + activeSharedRoot);
   prepareWindow(controllerRef);
+  $.NSURLCache.sharedURLCache.removeAllCachedResponses;
+  stopExistingServerOnPort();
   renderPlaceholder(
     'Loading Shared Library Manager',
     'Preparing your local shared-skill dashboard...'
