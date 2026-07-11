@@ -12,13 +12,32 @@ from pathlib import Path
 
 DEFAULT_APP_ROOTS = [Path("/Applications"), Path.home() / "Applications"]
 KNOWN_CLIENT_ALIASES = {
-    "codex": ["Codex"],
+    "codex": ["Codex", "ChatGPT", "OpenAI Codex"],
     "workbuddy": ["WorkBuddy"],
     "trae": ["Trae CN", "Trae"],
     "trae-cn": ["Trae CN", "Trae"],
     "cursor": ["Cursor"],
     "claude": ["Claude"],
     "claude-desktop": ["Claude"],
+}
+PREFERRED_BUNDLE_NAMES = {
+    "codex": ["ChatGPT", "Codex"],
+    "workbuddy": ["WorkBuddy"],
+    "trae": ["Trae CN", "Trae"],
+    "trae-cn": ["Trae CN", "Trae"],
+    "cursor": ["Cursor"],
+    "claude": ["Claude"],
+    "claude-desktop": ["Claude"],
+}
+KNOWN_BUNDLE_IDENTIFIERS = {
+    "codex": {"com.openai.codex"},
+    "cursor": {"com.todesktop.230313mzl4w4u92"},
+}
+KNOWN_URL_SCHEMES = {
+    "codex": {"codex"},
+    "cursor": {"cursor"},
+    "claude": {"claude"},
+    "claude-desktop": {"claude"},
 }
 PREFERRED_RESOURCE_NAMES = {
     "codex": ["icon-codex-dark-color.png", "icon.png", "icon.icns", "app.icns"],
@@ -86,20 +105,66 @@ def discover_app_bundle(label: str) -> Path | None:
     normalized_terms = {normalize(term) for term in terms}
     exact_matches: list[Path] = []
     partial_matches: list[Path] = []
+    metadata_matches: list[Path] = []
+    bundle_name_matches = {normalize(name) for name in PREFERRED_BUNDLE_NAMES.get(label, [])}
+    bundle_id_matches = KNOWN_BUNDLE_IDENTIFIERS.get(label, set())
+    scheme_matches = {normalize(item) for item in KNOWN_URL_SCHEMES.get(label, set())}
 
     for root in DEFAULT_APP_ROOTS:
         if not root.exists():
             continue
         for child in root.glob("*.app"):
             stem_key = normalize(child.stem)
+            if stem_key in bundle_name_matches:
+                exact_matches.append(child)
+                continue
             if stem_key in normalized_terms:
                 exact_matches.append(child)
                 continue
             if any(term in stem_key or stem_key in term for term in normalized_terms):
                 partial_matches.append(child)
+                continue
+
+            info_plist = child / "Contents" / "Info.plist"
+            if not info_plist.exists():
+                continue
+            try:
+                raw = subprocess.run(
+                    ["plutil", "-convert", "json", "-o", "-", str(info_plist)],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                payload = json.loads(raw.stdout)
+            except Exception:
+                continue
+
+            metadata_terms = {
+                normalize(str(payload.get("CFBundleDisplayName", ""))),
+                normalize(str(payload.get("CFBundleName", ""))),
+                normalize(str(payload.get("BundleSigningBaseName", ""))),
+                normalize(str(payload.get("CFBundleIdentifier", ""))),
+            }
+            for alt_name in payload.get("CFBundleAlternateNames", []):
+                metadata_terms.add(normalize(str(alt_name)))
+            for url_type in payload.get("CFBundleURLTypes", []):
+                for scheme in url_type.get("CFBundleURLSchemes", []):
+                    metadata_terms.add(normalize(str(scheme)))
+
+            bundle_identifier = str(payload.get("CFBundleIdentifier", ""))
+            if bundle_identifier in bundle_id_matches:
+                metadata_matches.append(child)
+                continue
+            if scheme_matches and scheme_matches.intersection(metadata_terms):
+                metadata_matches.append(child)
+                continue
+            if metadata_terms.intersection(normalized_terms):
+                metadata_matches.append(child)
 
     if exact_matches:
         return sorted(exact_matches)[0]
+    if metadata_matches:
+        return sorted(metadata_matches)[0]
     if partial_matches:
         return sorted(partial_matches)[0]
     return None

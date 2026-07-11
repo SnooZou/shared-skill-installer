@@ -39,11 +39,17 @@ const I18N = {
     detailTitle: "容器详情",
     detailSubtitle: "查看选中容器的来源、状态和技能清单",
     searchPlaceholder: "搜索容器名、技能名、功能简介",
-    themeDark: "深色",
-    themeLight: "浅色",
-    langZh: "中文",
-    langEn: "EN",
-    sidebarViews: "视图",
+    toggleTheme: "切换深浅模式",
+    toggleThemeToLight: "切换为浅色模式",
+    toggleThemeToDark: "切换为深色模式",
+    toggleLocale: "切换中英文",
+    toggleLocaleToEn: "切换为英文界面",
+    toggleLocaleToZh: "切换为中文界面",
+    sidebarSummary: "侧边摘要",
+    sidebarActive: "已登记容器",
+    sidebarClients: "已接入客户端",
+    sidebarUpdates: "可更新仓库",
+    sidebarStorage: "占用空间",
     sidebarSelected: "当前选中",
     sidebarRoot: "共享库根目录",
     navOverview: "总览",
@@ -159,11 +165,17 @@ const I18N = {
     detailTitle: "Container Detail",
     detailSubtitle: "Inspect the selected container source, health, and included skills",
     searchPlaceholder: "Search by container, skill, or description",
-    themeDark: "Dark",
-    themeLight: "Light",
-    langZh: "中文",
-    langEn: "EN",
-    sidebarViews: "Views",
+    toggleTheme: "Toggle theme",
+    toggleThemeToLight: "Switch to light mode",
+    toggleThemeToDark: "Switch to dark mode",
+    toggleLocale: "Toggle language",
+    toggleLocaleToEn: "Switch to English",
+    toggleLocaleToZh: "Switch to Chinese",
+    sidebarSummary: "Sidebar Summary",
+    sidebarActive: "Indexed Containers",
+    sidebarClients: "Connected Clients",
+    sidebarUpdates: "Updates",
+    sidebarStorage: "Storage",
     sidebarSelected: "Selected",
     sidebarRoot: "Library Root",
     navOverview: "Overview",
@@ -354,60 +366,15 @@ function skillGitHubUrl(container, skill) {
 const CLIENT_PRESETS = {
   codex: {
     displayName: "Codex",
-    className: "codex",
-    icon: `
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <defs>
-          <linearGradient id="client-icon-codex-__ID__" x1="6" y1="8" x2="42" y2="40" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#81B7FF" />
-            <stop offset="1" stop-color="#6B5DFF" />
-          </linearGradient>
-        </defs>
-        <rect x="5" y="5" width="38" height="38" rx="12" fill="url(#client-icon-codex-__ID__)" />
-        <path d="M18 24L22 20M18 24L22 28" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M27 30H32" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
-      </svg>
-    `,
   },
   workbuddy: {
     displayName: "WorkBuddy",
-    className: "workbuddy",
-    icon: `
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <defs>
-          <linearGradient id="client-icon-workbuddy-__ID__" x1="8" y1="6" x2="40" y2="42" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#4EF0D5" />
-            <stop offset="1" stop-color="#22B573" />
-          </linearGradient>
-        </defs>
-        <rect x="5" y="5" width="38" height="38" rx="12" fill="url(#client-icon-workbuddy-__ID__)" />
-        <path d="M16 19.5C16 16.46 18.46 14 21.5 14H26.5C29.54 14 32 16.46 32 19.5V26.5C32 29.54 29.54 32 26.5 32H21.5C18.46 32 16 29.54 16 26.5V19.5Z" fill="#ECFFF8"/>
-        <circle cx="22" cy="23" r="1.8" fill="#18A571"/>
-        <circle cx="27" cy="23" r="1.8" fill="#18A571"/>
-        <path d="M21.5 28C22.47 29.08 23.53 29.08 24.5 28" stroke="#18A571" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    `,
   },
   trae: {
     displayName: "TRAE",
-    className: "trae",
-    icon: `
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <defs>
-          <linearGradient id="client-icon-trae-__ID__" x1="10" y1="8" x2="38" y2="40" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#45FFBC" />
-            <stop offset="1" stop-color="#0F8F6E" />
-          </linearGradient>
-        </defs>
-        <rect x="5" y="5" width="38" height="38" rx="12" fill="#09110F" />
-        <rect x="12" y="13" width="24" height="22" rx="4" stroke="url(#client-icon-trae-__ID__)" stroke-width="3" fill="none"/>
-        <path d="M19 24L22.5 21L26 24L29.5 21L33 24" stroke="url(#client-icon-trae-__ID__)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    `,
   },
   default: {
     displayName: null,
-    className: "default",
     icon: `
       <svg viewBox="0 0 48 48" aria-hidden="true">
         <defs>
@@ -439,20 +406,44 @@ function formatClientLabel(value) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
+function iconTheme() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 15.2A7.5 7.5 0 0 1 8.8 4A8.8 8.8 0 1 0 20 15.2Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  `;
+}
+
+function iconLocale() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 7h10M9 4c0 6-2.6 11.3-6 14M14 20l5-10l5 10M15.8 16.5h6.4M11.5 18c3.2-2.3 5.3-5.7 6.1-10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  `;
+}
+
+function summaryMetric(label, value, tone = "") {
+  return `
+    <article class="sidebar-stat ${tone ? `sidebar-stat--${tone}` : ""}">
+      <div class="sidebar-stat__label">${escapeHtml(label)}</div>
+      <div class="sidebar-stat__value">${escapeHtml(value)}</div>
+    </article>
+  `;
+}
+
 function clientIconMarkup(value, suffix = "") {
   const key = clientKey(value);
-  const preset = CLIENT_PRESETS[key] || CLIENT_PRESETS.default;
   const officialIcon = CLIENT_ICON_MANIFEST[key]?.path;
   if (officialIcon) {
     return `
-      <span class="client-avatar client-avatar--${escapeHtml(preset.className)} client-avatar--official" aria-hidden="true">
+      <span class="client-avatar client-avatar--official" aria-hidden="true">
         <img class="client-avatar__img" src="${escapeHtml(officialIcon)}" alt="" />
       </span>
     `;
   }
-  const iconMarkup = preset.icon.replaceAll("__ID__", `${key || "client"}-${suffix}`);
+  const iconMarkup = CLIENT_PRESETS.default.icon.replaceAll("__ID__", `${key || "client"}-${suffix}`);
   return `
-    <span class="client-avatar client-avatar--${escapeHtml(preset.className)}" aria-hidden="true">
+    <span class="client-avatar client-avatar--default" aria-hidden="true">
       ${iconMarkup}
     </span>
   `;
@@ -597,41 +588,30 @@ function renderBrandChrome(state) {
 }
 
 function renderThemeAndLocaleControls() {
-  document.getElementById("theme-dark-btn").textContent = t("themeDark");
-  document.getElementById("theme-light-btn").textContent = t("themeLight");
-  document.getElementById("lang-zh-btn").textContent = t("langZh");
-  document.getElementById("lang-en-btn").textContent = t("langEn");
-  document.getElementById("theme-dark-btn").classList.toggle("is-active", UI_STATE.theme === "dark");
-  document.getElementById("theme-light-btn").classList.toggle("is-active", UI_STATE.theme === "light");
-  document.getElementById("lang-zh-btn").classList.toggle("is-active", UI_STATE.locale === "zh");
-  document.getElementById("lang-en-btn").classList.toggle("is-active", UI_STATE.locale === "en");
+  const themeButton = document.getElementById("theme-toggle-btn");
+  const localeButton = document.getElementById("locale-toggle-btn");
+  const themeTitle = UI_STATE.theme === "dark" ? t("toggleThemeToLight") : t("toggleThemeToDark");
+  const localeTitle = UI_STATE.locale === "zh" ? t("toggleLocaleToEn") : t("toggleLocaleToZh");
+  themeButton.innerHTML = iconTheme();
+  themeButton.title = themeTitle;
+  themeButton.setAttribute("aria-label", themeTitle);
+  themeButton.classList.toggle("is-light", UI_STATE.theme === "light");
+  localeButton.innerHTML = iconLocale();
+  localeButton.title = localeTitle;
+  localeButton.setAttribute("aria-label", localeTitle);
+  localeButton.classList.toggle("is-en", UI_STATE.locale === "en");
 }
 
 function renderSidebar(state, containers) {
   const summary = state.summary;
-  const unindexedCount = state.containers.filter((item) => item.indexed === false).length;
-  const attentionCount = state.containers.filter((item) => item.indexed === false || item.broken_links > 0 || item.duplicate_count > 0 || item.git?.update_state === "update_available").length;
-  const navItems = [
-    { key: "all", label: t("navOverview"), count: summary.active_container_count },
-    { key: "attention", label: t("navAttention"), count: attentionCount },
-    { key: "unindexed", label: t("navUnindexed"), count: unindexedCount },
-    { key: "updates", label: t("navUpdates"), count: summary.update_available_count },
-    { key: "multi", label: t("navMulti"), count: state.containers.filter((item) => item.kind === "multi-skill" && !item.preview).length },
-    { key: "preview", label: t("navPreview"), count: summary.preview_container_count },
-  ];
-
-  document.getElementById("sidebar-nav").innerHTML = `
-    <div class="nav-section">${escapeHtml(t("sidebarViews"))}</div>
-    ${navItems
-      .map(
-        (item) => `
-          <button class="nav-item ${UI_STATE.filter === item.key ? "is-active" : ""}" data-filter="${item.key}">
-            <span>${escapeHtml(item.label)}</span>
-            <span class="nav-item__count">${escapeHtml(item.count)}</span>
-          </button>
-        `,
-      )
-      .join("")}
+  document.getElementById("sidebar-summary").innerHTML = `
+    <div class="nav-section">${escapeHtml(t("sidebarSummary"))}</div>
+    <div class="sidebar-stats">
+      ${summaryMetric(t("sidebarActive"), summary.active_container_count, "accent")}
+      ${summaryMetric(t("sidebarClients"), state.clients.length, "ok")}
+      ${summaryMetric(t("sidebarUpdates"), summary.update_available_count, "warn")}
+      ${summaryMetric(t("sidebarStorage"), summary.total_storage_label)}
+    </div>
   `;
 
   const selected = state.containers.find((item) => item.name === UI_STATE.selectedContainer) || containers[0] || null;
@@ -994,32 +974,21 @@ function bindEvents(state) {
 
   const bindOnce = (id, fn) => {
     const el = document.getElementById(id);
+    if (!el) return;
     if (el.dataset.bound !== "true") {
       el.addEventListener("click", fn);
       el.dataset.bound = "true";
     }
   };
 
-  bindOnce("theme-dark-btn", () => {
-    UI_STATE.theme = "dark";
+  bindOnce("theme-toggle-btn", () => {
+    UI_STATE.theme = UI_STATE.theme === "dark" ? "light" : "dark";
     localStorage.setItem(STORAGE_KEYS.theme, UI_STATE.theme);
     render(state);
   });
 
-  bindOnce("theme-light-btn", () => {
-    UI_STATE.theme = "light";
-    localStorage.setItem(STORAGE_KEYS.theme, UI_STATE.theme);
-    render(state);
-  });
-
-  bindOnce("lang-zh-btn", () => {
-    UI_STATE.locale = "zh";
-    localStorage.setItem(STORAGE_KEYS.locale, UI_STATE.locale);
-    render(state);
-  });
-
-  bindOnce("lang-en-btn", () => {
-    UI_STATE.locale = "en";
+  bindOnce("locale-toggle-btn", () => {
+    UI_STATE.locale = UI_STATE.locale === "zh" ? "en" : "zh";
     localStorage.setItem(STORAGE_KEYS.locale, UI_STATE.locale);
     render(state);
   });

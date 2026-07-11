@@ -34,7 +34,7 @@
           </div>
         </div>
 
-        <nav class="sidebar__nav" id="sidebar-nav"></nav>
+        <div class="sidebar__summary" id="sidebar-summary"></div>
 
         <div class="sidebar__footer" id="sidebar-footer"></div>
       </aside>
@@ -48,14 +48,8 @@
           </div>
           <div class="page-header__controls">
             <div class="toolbar-controls">
-              <div class="segmented">
-                <button class="segmented__button" id="theme-dark-btn" type="button">Dark</button>
-                <button class="segmented__button" id="theme-light-btn" type="button">Light</button>
-              </div>
-              <div class="segmented">
-                <button class="segmented__button" id="lang-zh-btn" type="button">中文</button>
-                <button class="segmented__button" id="lang-en-btn" type="button">EN</button>
-              </div>
+              <button class="icon-toggle" id="theme-toggle-btn" type="button" aria-label="Toggle theme" title="Toggle theme"></button>
+              <button class="icon-toggle" id="locale-toggle-btn" type="button" aria-label="Toggle language" title="Toggle language"></button>
             </div>
           </div>
           <div class="page-header__meta" id="header-meta"></div>
@@ -88,10 +82,8 @@
           <div class="workspace-toolbar">
             <div class="searchbox">
               <svg class="searchbox__icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M11 5a6 6 0 1 0 0 12a6 6 0 0 0 0-12Zm0-2a8 8 0 1 1 4.9 14.3l4.4 4.4l-1.4 1.4l-4.4-4.4A8 8 0 0 1 11 3Z"
-                  fill="currentColor"
-                />
+                <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2" />
+                <path d="M16 16L20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.2" />
               </svg>
               <input id="search-input" type="search" placeholder="搜索容器名、skill 名、功能简介" />
             </div>
