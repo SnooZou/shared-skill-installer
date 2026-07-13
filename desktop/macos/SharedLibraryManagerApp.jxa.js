@@ -206,7 +206,7 @@ function prepareWindow(controller) {
     $.NSWindowStyleMaskResizable |
     $.NSWindowStyleMaskMiniaturizable;
 
-  const rect = $.NSMakeRect(0, 0, 1460, 940);
+  const rect = $.NSMakeRect(0, 0, 1320, 860);
   const window = $.NSWindow.alloc.initWithContentRectStyleMaskBackingDefer(
     rect,
     windowStyle,
@@ -215,7 +215,7 @@ function prepareWindow(controller) {
   );
   window.setTitle($(APP_TITLE));
   window.center;
-  window.setMinSize($.NSMakeSize(1120, 760));
+  window.setMinSize($.NSMakeSize(1080, 720));
 
   const configuration = $.WKWebViewConfiguration.alloc.init;
   const webView = $.WKWebView.alloc.initWithFrameConfiguration(rect, configuration);

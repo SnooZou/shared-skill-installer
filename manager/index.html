@@ -20,7 +20,7 @@
               <span class="sidebar__title-line">Manager</span>
             </h1>
           </div>
-          <p class="sidebar__subtitle" id="brand-subtitle">共享技能库可视化管理器</p>
+          <div class="sidebar__subtitle" id="brand-subtitle" aria-hidden="true"></div>
           <div class="sidebar__brandbar">
             <span class="brand-badge" id="brand-version">V1.3.0</span>
             <a
@@ -48,7 +48,7 @@
       </aside>
 
       <main class="app-main">
-        <header class="page-header">
+        <header class="page-header__top">
           <div class="page-header__copy">
             <div class="page-header__crumb" id="page-crumb">Overview / Shared Library</div>
             <h2 id="page-title">Shared Library Manager</h2>
@@ -60,8 +60,8 @@
               <button class="icon-toggle" id="locale-toggle-btn" type="button" aria-label="Toggle language" title="Toggle language"></button>
             </div>
           </div>
-          <div class="page-header__meta" id="header-meta"></div>
         </header>
+        <div class="page-header__meta" id="header-meta"></div>
 
         <div class="notice-slot" id="app-notice" hidden></div>
 
@@ -99,11 +99,10 @@
             <div class="filter-pills" id="filter-pills"></div>
 
             <label class="sortbox">
-              <span id="sort-label">排序</span>
               <select id="sort-select">
                 <option value="attention">按关注度</option>
                 <option value="size">按体积</option>
-                <option value="count">按 skill 数量</option>
+                <option value="count">按技能数量</option>
                 <option value="name">按名称</option>
               </select>
             </label>

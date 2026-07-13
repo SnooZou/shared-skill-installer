@@ -22,6 +22,7 @@ CONFIG_SCRIPT = ROOT / "scripts" / "shared-library-config.py"
 EXPORT_SCRIPT = ROOT / "scripts" / "export-shared-library-state.py"
 BUILD_SCRIPT = ROOT / "scripts" / "build-shared-library-manager.sh"
 RELOCATE_SCRIPT = ROOT / "scripts" / "relocate-shared-library.py"
+CLIENT_ICON_MANIFEST = MANAGER_DIR / "data" / "client-icons.js"
 
 
 def run(cmd: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
@@ -62,9 +63,27 @@ def build_state_payload(shared_root: Path) -> dict:
         )
         if proc.returncode != 0:
             raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "Failed to export library state")
-        return json.loads(tmp_path.read_text())
+        payload = json.loads(tmp_path.read_text())
+        payload["client_icons"] = read_client_icons()
+        return payload
     finally:
         tmp_path.unlink(missing_ok=True)
+
+
+def read_client_icons() -> dict:
+    if not CLIENT_ICON_MANIFEST.exists():
+        return {}
+    raw = CLIENT_ICON_MANIFEST.read_text(encoding="utf-8").strip()
+    prefix = "window.SHARED_LIBRARY_CLIENT_ICONS = "
+    if not raw.startswith(prefix):
+        return {}
+    body = raw[len(prefix):]
+    if body.endswith(";"):
+        body = body[:-1]
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError:
+        return {}
 
 
 def refresh_bundled_assets(shared_root: Path) -> dict:

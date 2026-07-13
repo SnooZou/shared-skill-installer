@@ -17,7 +17,7 @@ const APP_META = {
   version: "V1.3.0",
   repoUrl: "https://github.com/SnooZou/shared-skill-installer",
 };
-const CLIENT_ICON_MANIFEST = window.SHARED_LIBRARY_CLIENT_ICONS || {};
+const STATIC_CLIENT_ICON_MANIFEST = window.SHARED_LIBRARY_CLIENT_ICONS || {};
 const MANAGER_API_BASE = /^https?:$/i.test(window.location.protocol) ? "" : null;
 let APP_STATE = null;
 
@@ -26,7 +26,7 @@ const I18N = {
     documentTitle: "Skill Manager",
     brandEyebrow: "共享技能库",
     brandTitleLines: ["Skill", "Manager"],
-    brandSubtitle: "共享技能库可视化管理器",
+    brandSubtitle: "",
     repoLinkLabel: "打开 GitHub 仓库",
     pageCrumb: "总览 / 共享技能库",
     pageTitle: "共享技能库管理台",
@@ -34,7 +34,6 @@ const I18N = {
     heroEyebrow: "库状态",
     clientsTitle: "已连接客户端",
     clientsSubtitle: "当前已纳入共享体系的本地智能体客户端",
-    sortLabel: "排序",
     listTitle: "共享容器",
     detailTitle: "容器详情",
     detailSubtitle: "查看选中容器的来源、状态和技能清单",
@@ -152,7 +151,7 @@ const I18N = {
     documentTitle: "Skill Manager",
     brandEyebrow: "Shared Library",
     brandTitleLines: ["Skill", "Manager"],
-    brandSubtitle: "Visual manager for your local shared skill library",
+    brandSubtitle: "",
     repoLinkLabel: "Open GitHub repository",
     pageCrumb: "Overview / Shared Library",
     pageTitle: "Shared Library Manager",
@@ -160,7 +159,6 @@ const I18N = {
     heroEyebrow: "Library Health",
     clientsTitle: "Connected Clients",
     clientsSubtitle: "Local AI clients currently connected to the shared library system",
-    sortLabel: "Sort",
     listTitle: "Shared Containers",
     detailTitle: "Container Detail",
     detailSubtitle: "Inspect the selected container source, health, and included skills",
@@ -285,6 +283,10 @@ function t(key, ...args) {
 
 function hasManagerApi() {
   return MANAGER_API_BASE !== null;
+}
+
+function clientIconManifest(state = APP_STATE) {
+  return state?.client_icons || STATIC_CLIENT_ICON_MANIFEST || {};
 }
 
 function setNotice(message = "", tone = "ok") {
@@ -449,9 +451,9 @@ function pathText(value, cls = "") {
   return `<span class="path-text${extra}" title="${escapeHtml(value || "—")}">${escapeHtml(value || "—")}</span>`;
 }
 
-function clientIconMarkup(value, suffix = "") {
+function clientIconMarkup(value, suffix = "", state = APP_STATE) {
   const key = clientKey(value);
-  const officialIcon = CLIENT_ICON_MANIFEST[key]?.path;
+  const officialIcon = clientIconManifest(state)[key]?.path;
   if (officialIcon) {
     return `
       <span class="client-avatar client-avatar--official" aria-hidden="true">
@@ -574,7 +576,6 @@ function renderStaticTexts() {
   document.getElementById("hero-eyebrow").textContent = t("heroEyebrow");
   document.getElementById("clients-title").textContent = t("clientsTitle");
   document.getElementById("clients-subtitle").textContent = t("clientsSubtitle");
-  document.getElementById("sort-label").textContent = t("sortLabel");
   document.getElementById("list-title").textContent = t("listTitle");
   document.getElementById("detail-title").textContent = t("detailTitle");
   document.getElementById("detail-subtitle").textContent = t("detailSubtitle");
@@ -715,13 +716,13 @@ function renderClients(state) {
       (client, index) => `
         <article class="client-row">
           <div class="client-row__main">
-            ${clientIconMarkup(client.label, index)}
-            <div>
+            ${clientIconMarkup(client.label, index, state)}
+            <div class="client-row__copy">
               <div class="client-row__name">${escapeHtml(formatClientLabel(client.label))}</div>
               <div class="client-row__path">${pathText(client.path)}</div>
             </div>
           </div>
-          <div>${badge(t("clientConnected"), "ok")}</div>
+          <div class="client-row__status">${badge(t("clientConnected"), "ok")}</div>
         </article>
       `,
     )
@@ -1093,7 +1094,7 @@ function render(state) {
 
 async function main() {
   try {
-    APP_STATE = await loadState();
+    APP_STATE = await loadState(true);
     if (!APP_STATE) {
       document.body.innerHTML = "<p>Missing shared library state data.</p>";
       return;

@@ -62,6 +62,10 @@ fi
 [ -f "${ICON_SOURCE}" ] || { echo "Icon source not found: ${ICON_SOURCE}" >&2; exit 1; }
 
 VERSION="$(cat "${VERSION_FILE}")"
+SYSTEM_VERSION="$(printf '%s' "${VERSION}" | sed 's/^[^0-9]*//')"
+if [ -z "${SYSTEM_VERSION}" ]; then
+  SYSTEM_VERSION="1.0.0"
+fi
 APP_ID="com.snoozou.shared-library-manager"
 BUILD_APP="${BUILD_ROOT}/${APP_SLUG}"
 ICON_OUTPUT="${BUILD_ROOT}/skill-manager.icns"
@@ -119,9 +123,9 @@ cat > "${BUILD_APP}/Contents/Info.plist" <<EOF
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>
-  <string>${VERSION}</string>
+  <string>${SYSTEM_VERSION}</string>
   <key>CFBundleVersion</key>
-  <string>${VERSION}</string>
+  <string>${SYSTEM_VERSION}</string>
   <key>CFBundleIconFile</key>
   <string>skill-manager</string>
   <key>CFBundleIconName</key>

@@ -53,7 +53,7 @@ static NSString *const kServerLogPath = @"/tmp/shared-library-manager-app.log";
 }
 
 - (void)prepareWindow {
-  NSRect rect = NSMakeRect(0, 0, 1460, 940);
+  NSRect rect = NSMakeRect(0, 0, 1320, 860);
   NSWindowStyleMask style = NSWindowStyleMaskTitled |
                             NSWindowStyleMaskClosable |
                             NSWindowStyleMaskResizable |
@@ -63,7 +63,7 @@ static NSString *const kServerLogPath = @"/tmp/shared-library-manager-app.log";
                                               backing:NSBackingStoreBuffered
                                                 defer:NO];
   self.window.title = kAppTitle;
-  self.window.minSize = NSMakeSize(1120, 760);
+  self.window.minSize = NSMakeSize(1080, 720);
   self.window.delegate = self;
   [self.window center];
 

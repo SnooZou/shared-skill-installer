@@ -9,6 +9,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
+try:
+    from PIL import Image
+except Exception:  # pragma: no cover
+    Image = None
+
 
 DEFAULT_APP_ROOTS = [Path("/Applications"), Path.home() / "Applications"]
 KNOWN_CLIENT_ALIASES = {
@@ -48,6 +53,7 @@ PREFERRED_RESOURCE_NAMES = {
     "claude": ["icon.png", "icon.icns", "Claude.icns", "app.icns"],
     "claude-desktop": ["icon.png", "icon.icns", "Claude.icns", "app.icns"],
 }
+ALPHA_TRIM_THRESHOLD = 24
 
 
 def normalize(value: str) -> str:
@@ -216,7 +222,7 @@ def convert_or_copy_icon(source: Path, destination: Path) -> bool:
     destination.parent.mkdir(parents=True, exist_ok=True)
     if source.suffix.lower() == ".png":
         shutil.copy2(source, destination)
-        return True
+        return trim_icon_padding(destination)
 
     if source.suffix.lower() == ".icns":
         result = subprocess.run(
@@ -224,9 +230,58 @@ def convert_or_copy_icon(source: Path, destination: Path) -> bool:
             capture_output=True,
             text=True,
         )
-        return result.returncode == 0 and destination.exists()
+        return result.returncode == 0 and destination.exists() and trim_icon_padding(destination)
 
     return False
+
+
+def trim_icon_padding(path: Path) -> bool:
+    if Image is None or not path.exists():
+        return path.exists()
+    try:
+        with Image.open(path) as img:
+          rgba = img.convert("RGBA")
+          alpha = rgba.getchannel("A")
+          bbox = effective_icon_bbox(alpha)
+          if not bbox:
+              rgba.save(path)
+              return True
+          cropped = rgba.crop(bbox)
+          width, height = cropped.size
+          side = max(width, height)
+          canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+          offset = ((side - width) // 2, (side - height) // 2)
+          canvas.paste(cropped, offset)
+          canvas.save(path)
+        return True
+    except Exception:
+        return path.exists()
+
+
+def effective_icon_bbox(alpha_channel) -> tuple[int, int, int, int] | None:
+    base_bbox = alpha_channel.getbbox()
+    if not base_bbox:
+        return None
+
+    solid_bbox = alpha_channel.point(
+        lambda value: 255 if value >= ALPHA_TRIM_THRESHOLD else 0
+    ).getbbox()
+    if not solid_bbox:
+        return base_bbox
+
+    base_w = max(1, base_bbox[2] - base_bbox[0])
+    base_h = max(1, base_bbox[3] - base_bbox[1])
+    solid_w = solid_bbox[2] - solid_bbox[0]
+    solid_h = solid_bbox[3] - solid_bbox[1]
+
+    width_gain = base_w - solid_w
+    height_gain = base_h - solid_h
+
+    # Keep intentionally full-bleed icons intact, but ignore faint halo/shadow
+    # layers when they noticeably expand the alpha bounds.
+    if width_gain >= 8 or height_gain >= 8:
+        return solid_bbox
+    return base_bbox
 
 
 def write_manifest(entries: dict[str, dict[str, str]], manifest_path: Path) -> None:
