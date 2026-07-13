@@ -24,6 +24,8 @@ let APP_STATE = null;
 const I18N = {
   zh: {
     documentTitle: "Skill Manager",
+    loadingTitle: "正在加载管理台…",
+    loadingBody: "正在读取共享库状态、客户端链接和技能清单。",
     brandEyebrow: "共享技能库",
     brandTitleLines: ["Skill", "Manager"],
     brandSubtitle: "",
@@ -149,6 +151,8 @@ const I18N = {
   },
   en: {
     documentTitle: "Skill Manager",
+    loadingTitle: "Loading Shared Library Manager...",
+    loadingBody: "Reading shared library state, client links, and skill entries.",
     brandEyebrow: "Shared Library",
     brandTitleLines: ["Skill", "Manager"],
     brandSubtitle: "",
@@ -477,6 +481,18 @@ function applyDocumentSettings() {
   document.documentElement.dataset.theme = UI_STATE.theme;
   document.documentElement.lang = UI_STATE.locale === "zh" ? "zh-CN" : "en";
   document.title = t("documentTitle");
+}
+
+function setLoading(isLoading) {
+  document.body.classList.toggle("is-loading", isLoading);
+  const screen = document.getElementById("loading-screen");
+  if (!screen) return;
+  screen.hidden = !isLoading;
+  screen.setAttribute("aria-busy", isLoading ? "true" : "false");
+  const title = document.getElementById("loading-title");
+  const body = document.getElementById("loading-body");
+  if (title) title.textContent = t("loadingTitle");
+  if (body) body.textContent = t("loadingBody");
 }
 
 function linkBadge(link) {
@@ -1075,6 +1091,7 @@ function bindEvents(state) {
 
 function render(state) {
   applyDocumentSettings();
+  setLoading(false);
   renderStaticTexts();
   renderNotice();
   renderBrandChrome(state);
@@ -1094,13 +1111,17 @@ function render(state) {
 
 async function main() {
   try {
+    applyDocumentSettings();
+    setLoading(true);
     APP_STATE = await loadState(true);
     if (!APP_STATE) {
+      setLoading(false);
       document.body.innerHTML = "<p>Missing shared library state data.</p>";
       return;
     }
     render(APP_STATE);
   } catch (error) {
+    setLoading(false);
     document.body.innerHTML = `<p>${escapeHtml(error.message || "Failed to load manager state.")}</p>`;
   }
 }
