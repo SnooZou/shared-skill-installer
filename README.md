@@ -11,6 +11,36 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ## 中文说明
 
+### 🖥 Shared Library Manager
+
+`Shared Library Manager` 是这次比较大的功能更新。它把原本偏抽象的共享 skill 机制，进一步做成了可直接查看、可直接进入的本地可视化管理界面。
+
+![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
+
+它主要用来查看：
+
+- 共享库里当前有哪些 skill / 仓库
+- 哪些是正式登记项，哪些是未登记但已存在的本地 skill
+- Codex、WorkBuddy、TRAE 等客户端是否都已正确接入
+- 哪些仓库可能有更新，哪些 skill 缺少客户端链接
+- 已安装客户端如果本机存在官方应用图标，管理台会优先使用提取后的本地图标
+
+怎么打开客户端版：
+
+- macOS 首次安装后，会自动生成：`~/Applications/Shared Library Manager.app`
+- 后续直接像普通本地应用一样打开它即可
+- 也可以执行：`./scripts/open-shared-library-manager.sh`
+- 这个脚本在 macOS 下会优先打开本地壳应用；如果壳应用不可用，再自动退回浏览器方式
+
+怎么打开网页版：
+
+- 先执行：`./scripts/build-shared-library-manager.sh`
+- 再在浏览器里打开：`manager/index.html`
+- 如果你只是想浏览和查看状态，网页版就够用
+- 如果你要用“更改位置”这类依赖本地接口的动作，优先使用客户端版
+
+---
+
 ### ⚡ 新手快速开始
 
 如果你是第一次安装 `shared-skill-installer`，直接用默认位置即可，不需要先理解底层结构。
@@ -150,32 +180,39 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 - 新增客户端时，优先直接使用新增客户端的一键式口令
 - 如果你机器里已经有一批旧 skill，升级到 `V1.3.1` 后先执行一次共享库重整流程
 
-### 🖥 Shared Library Manager
-
-`V1.3.1` 继续内置本地可视化管理台，并把它封装成可重开的本地壳应用入口。
-
-![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
-
-- 本地入口：`manager/index.html`
-- 刷新数据：`./scripts/build-shared-library-manager.sh`
-- 一键准备并打开入口路径：`./scripts/open-shared-library-manager.sh`
-- macOS 假本地应用：`~/Applications/Shared Library Manager.app`
-- 构建壳应用：`./scripts/build-shared-library-manager-app.sh`
-- 客户端图标提取：`./scripts/extract-client-icons.py`
-
-它会显示：
-
-- 当前共享库里有哪些 skill / 仓库
-- 哪些是正式登记项，哪些是未登记但已存在的本地 skill
-- 管理台可直接按“未登记”筛选这些本地 skill
-- Codex、WorkBuddy、TRAE 等客户端是否全部接好入口
-- 已安装客户端如果本机存在官方应用图标，管理台会优先使用提取后的本地图标
-- 哪些仓库可能有更新，哪些 skill 缺少客户端链接
-- 详细版本迭代记录见：[CHANGELOG.md](./CHANGELOG.md)
-
 ---
 
 ## English Guide
+
+### 🖥 Shared Library Manager
+
+`Shared Library Manager` is one of the biggest updates in this release. It turns the shared skill workflow from something mostly abstract into a local visual dashboard that people can actually open and use.
+
+![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
+
+It is mainly for checking:
+
+- which skills and repositories are currently inside the shared library
+- which items are formally indexed and which local skills still exist but are not yet registered
+- whether Codex, WorkBuddy, TRAE, and other clients are connected correctly
+- which repositories may have updates and which skills are missing client links
+- extracted official local app icons when matching client apps are installed on the machine
+
+How to open the client app version:
+
+- on macOS, the first install creates: `~/Applications/Shared Library Manager.app`
+- after that, open it like a normal local app
+- you can also run: `./scripts/open-shared-library-manager.sh`
+- on macOS, that script tries the local app shell first, then falls back to a browser flow if needed
+
+How to open the web version:
+
+- first run: `./scripts/build-shared-library-manager.sh`
+- then open: `manager/index.html` in your browser
+- the web version is enough for browsing and checking state
+- for local API actions such as changing the shared library location, prefer the client app version
+
+---
 
 ### ⚡ Quick Start
 
@@ -314,3 +351,4 @@ This prompt is designed to avoid making the user hunt for local paths. Only if a
 - Always import new skills into the shared library first
 - Do not install separate copies into every client folder
 - When you add another client, prefer the one-click client-onboarding prompt
+- If you already have an older batch of local skills, run one shared-library reconciliation pass after upgrading to `V1.3.1`
