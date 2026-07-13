@@ -124,6 +124,23 @@ p {
   padding: 4px 10px 0;
 }
 
+.sidebar__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  min-width: 0;
+}
+
+.sidebar__brandmark {
+  width: 30px;
+  height: 30px;
+  display: block;
+  flex: none;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(38, 71, 198, 0.22);
+}
+
 .sidebar__eyebrow {
   color: var(--accent);
   font-size: 12px;
@@ -132,10 +149,10 @@ p {
 }
 
 .sidebar__title {
-  margin-top: 10px;
   font-size: 28px;
   line-height: 1.04;
   letter-spacing: -0.03em;
+  margin: 0;
 }
 
 .sidebar__subtitle {

@@ -5,6 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 VERSION_FILE="${ROOT}/VERSION"
 SOURCE_FILE="${ROOT}/desktop/macos/SharedLibraryManagerApp.jxa.js"
+ICON_SOURCE="${ROOT}/desktop/macos/assets/skill-manager-app-icon.png"
 BUILD_ROOT="${ROOT}/.build/macos-manager-app"
 APP_NAME="${APP_NAME:-Shared Library Manager}"
 APP_SLUG="${APP_SLUG:-${APP_NAME}.app}"
@@ -55,14 +56,35 @@ if [ "$(uname -s)" != "Darwin" ]; then
 fi
 
 [ -x "/usr/bin/osacompile" ] || { echo "osacompile not found on this Mac." >&2; exit 1; }
+[ -x "/usr/bin/sips" ] || { echo "sips not found on this Mac." >&2; exit 1; }
 [ -f "${SOURCE_FILE}" ] || { echo "Source not found: ${SOURCE_FILE}" >&2; exit 1; }
+[ -f "${ICON_SOURCE}" ] || { echo "Icon source not found: ${ICON_SOURCE}" >&2; exit 1; }
 
 VERSION="$(cat "${VERSION_FILE}")"
 APP_ID="com.snoozou.shared-library-manager"
 BUILD_APP="${BUILD_ROOT}/${APP_SLUG}"
+ICONSET_DIR="${BUILD_ROOT}/skill-manager.iconset"
+ICON_OUTPUT="${BUILD_ROOT}/skill-manager.icns"
 
 rm -rf "${BUILD_APP}"
-mkdir -p "${BUILD_ROOT}" "$(dirname "${APP_DEST}")"
+rm -rf "${ICONSET_DIR}" "${ICON_OUTPUT}"
+mkdir -p "${BUILD_ROOT}" "$(dirname "${APP_DEST}")" "${ICONSET_DIR}"
+
+python3 - "${ICON_SOURCE}" "${ICON_OUTPUT}" <<'PY'
+import sys
+from pathlib import Path
+
+try:
+    from PIL import Image
+except Exception as exc:  # pragma: no cover
+    raise SystemExit(f"Pillow is required to build the macOS app icon: {exc}")
+
+src = Path(sys.argv[1])
+dest = Path(sys.argv[2])
+img = Image.open(src)
+img.save(dest)
+print(dest)
+PY
 
 /usr/bin/osacompile -l JavaScript -o "${BUILD_APP}" "${SOURCE_FILE}"
 /usr/bin/plutil -replace CFBundleIdentifier -string "${APP_ID}" "${BUILD_APP}/Contents/Info.plist"
@@ -71,6 +93,8 @@ mkdir -p "${BUILD_ROOT}" "$(dirname "${APP_DEST}")"
 /usr/bin/plutil -replace CFBundleShortVersionString -string "${VERSION}" "${BUILD_APP}/Contents/Info.plist"
 /usr/bin/plutil -replace CFBundleVersion -string "${VERSION}" "${BUILD_APP}/Contents/Info.plist"
 /usr/bin/plutil -replace LSMinimumSystemVersion -string "12.0" "${BUILD_APP}/Contents/Info.plist"
+/usr/bin/plutil -replace CFBundleIconFile -string "skill-manager.icns" "${BUILD_APP}/Contents/Info.plist"
+cp "${ICON_OUTPUT}" "${BUILD_APP}/Contents/Resources/skill-manager.icns"
 
 rsync -a --delete "${BUILD_APP}/" "${APP_DEST}/"
 
