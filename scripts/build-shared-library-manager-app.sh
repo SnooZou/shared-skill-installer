@@ -93,8 +93,12 @@ PY
 /usr/bin/plutil -replace CFBundleShortVersionString -string "${VERSION}" "${BUILD_APP}/Contents/Info.plist"
 /usr/bin/plutil -replace CFBundleVersion -string "${VERSION}" "${BUILD_APP}/Contents/Info.plist"
 /usr/bin/plutil -replace LSMinimumSystemVersion -string "12.0" "${BUILD_APP}/Contents/Info.plist"
-/usr/bin/plutil -replace CFBundleIconFile -string "skill-manager.icns" "${BUILD_APP}/Contents/Info.plist"
+/usr/bin/plutil -remove CFBundleIconName "${BUILD_APP}/Contents/Info.plist" || true
+/usr/bin/plutil -remove CFBundleIconFile "${BUILD_APP}/Contents/Info.plist" || true
+/usr/bin/plutil -insert CFBundleIconName -string "skill-manager" "${BUILD_APP}/Contents/Info.plist"
+/usr/bin/plutil -insert CFBundleIconFile -string "skill-manager" "${BUILD_APP}/Contents/Info.plist"
 cp "${ICON_OUTPUT}" "${BUILD_APP}/Contents/Resources/skill-manager.icns"
+cp "${ICON_OUTPUT}" "${BUILD_APP}/Contents/Resources/applet.icns"
 
 rsync -a --delete "${BUILD_APP}/" "${APP_DEST}/"
 
