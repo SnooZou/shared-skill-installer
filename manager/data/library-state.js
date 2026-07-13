@@ -1,10 +1,10 @@
 window.SHARED_LIBRARY_STATE = {
-  "generated_at": "2026-07-13T14:41:25.509061+00:00",
+  "generated_at": "2026-07-13T15:05:43.968585+00:00",
   "shared_root": "/Users/Snoo_1/AI-skills",
   "state_root": "/Users/Snoo_1/AI-skills/.shared-skill-state",
   "package_meta": {
     "name": "shared-skill-installer",
-    "version": "V1.3.0",
+    "version": "V1.3.1",
     "repo_url": "https://github.com/SnooZou/shared-skill-installer"
   },
   "clients": [
