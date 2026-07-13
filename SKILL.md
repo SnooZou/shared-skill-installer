@@ -62,6 +62,9 @@ The actual install script also accepts overrides through environment variables s
 8. If the user wants to connect more local AI clients, prefer `scripts/install-shared-skill --auto-detect-clients` first, then fall back to a manual client root only if auto-detection misses one.
 9. In `V1.3.1`, if the user has older skills already sitting in `AI-skills`, prefer `scripts/install-shared-skill --reconcile-library` so the installer can adopt them into shared state and repair missing client links.
 10. On macOS, bootstrap should automatically build `~/Applications/Shared Library Manager.app` so the user has a stable re-entry point that feels like a local app.
+11. Immediately after a first-time install finishes, ask the user a short plain-language follow-up: do they want to open the local app version of `Shared Library Manager` or the web version now.
+12. Do not require the user to remember an exact trigger phrase. If they later ask to reopen the manager, find the manager entry, open the client version, open the web version, or say they cannot find the entry point, treat that as the same manager-opening intent.
+13. If the user asks to reopen the manager but does not specify local app or web version, ask only the minimal follow-up needed or pick the local app version first on macOS and explain that the web version is also available.
 
 ## Install modes
 
@@ -146,6 +149,7 @@ For user-facing first-time install requests, prefer natural-language prompts suc
 - `请帮我安装这个仓库：https://github.com/SnooZou/shared-skill-installer 。安装前请先让我选择共享技能库位置：使用默认位置、从常用位置里选一个，或者由我自己指定。确认后再自动完成安装，并接入我本地已安装的智能体客户端。`
 
 Unless the user explicitly asks for technical details, do not lead with raw shell commands like `git clone ...` or `SHARED_ROOT=... ./scripts/bootstrap.sh`.
+The same rule applies to opening the bundled manager: prefer natural-language prompts and choices over raw terminal commands in user-facing instructions.
 
 When the user asks to choose a custom location, prefer presenting concrete options in plain language first:
 
@@ -167,3 +171,5 @@ When the user asks to choose a custom location, prefer presenting concrete optio
 - `请使用 $shared-skill-installer，自动识别我本机已安装的、支持本地 skill 的智能体客户端，把它们统一接入我的共享技能库，并刷新所有共享 skill 入口。`
 - `请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。`
 - `请使用 $shared-skill-installer，打开我的共享技能库管理台。`
+- `请使用 $shared-skill-installer，安装完成后请主动问我是要打开共享技能库管理台的本地客户端版，还是网页版。`
+- `请使用 $shared-skill-installer，我找不到共享技能库管理台入口了，帮我直接打开。`

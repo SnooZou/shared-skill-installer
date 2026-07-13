@@ -13,7 +13,7 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ### 🖥 Shared Library Manager
 
-`Shared Library Manager` 是这次比较大的功能更新。它把原本偏抽象的共享 skill 机制，进一步做成了可直接查看、可直接进入的本地可视化管理界面。
+`Shared Library Manager` 是这次 `V1.3.1` 版本比较大的功能更新。它把原本偏抽象的共享 skill 机制，进一步做成了可直接查看、可直接进入的本地可视化管理界面。
 
 ![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
 
@@ -29,13 +29,14 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 - macOS 首次安装后，会自动生成：`~/Applications/Shared Library Manager.app`
 - 后续直接像普通本地应用一样打开它即可
-- 也可以执行：`./scripts/open-shared-library-manager.sh`
-- 这个脚本在 macOS 下会优先打开本地壳应用；如果壳应用不可用，再自动退回浏览器方式
+- 第一次安装完成后，智能体应主动继续问你：现在要打开本地客户端版，还是网页版
+- 如果你选择客户端版，智能体应优先帮你打开本地壳应用入口
+- 如果你后续找不到入口，不需要记固定关键词，只要表达“帮我打开共享技能库管理台”“帮我打开客户端版”“我找不到入口了”这类意思即可
 
 怎么打开网页版：
 
-- 先执行：`./scripts/build-shared-library-manager.sh`
-- 再在浏览器里打开：`manager/index.html`
+- 第一次安装完成后，也可以直接在智能体的追问里选择“网页版”
+- 后续如果你想重新进入网页版，直接让智能体帮你“打开共享技能库管理台网页版”即可
 - 如果你只是想浏览和查看状态，网页版就够用
 - 如果你要用“更改位置”这类依赖本地接口的动作，优先使用客户端版
 
@@ -179,6 +180,8 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 - 不要在每个智能体目录里各装一份
 - 新增客户端时，优先直接使用新增客户端的一键式口令
 - 如果你机器里已经有一批旧 skill，升级到 `V1.3.1` 后先执行一次共享库重整流程
+- 安装完成后，建议让智能体继续追问一次：现在要打开管理台客户端版，还是网页版
+- 后续如果找不到入口，直接说出“想重新打开管理台”这类意思即可，不需要记死具体关键词
 
 ---
 
@@ -186,7 +189,7 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ### 🖥 Shared Library Manager
 
-`Shared Library Manager` is one of the biggest updates in this release. It turns the shared skill workflow from something mostly abstract into a local visual dashboard that people can actually open and use.
+`Shared Library Manager` is one of the biggest updates in `V1.3.1`. It turns the shared skill workflow from something mostly abstract into a local visual dashboard that people can actually open and use.
 
 ![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
 
@@ -202,13 +205,14 @@ How to open the client app version:
 
 - on macOS, the first install creates: `~/Applications/Shared Library Manager.app`
 - after that, open it like a normal local app
-- you can also run: `./scripts/open-shared-library-manager.sh`
-- on macOS, that script tries the local app shell first, then falls back to a browser flow if needed
+- right after the first install finishes, the AI client should actively ask whether you want to open the local app version or the web version
+- if you choose the local app version, the AI client should prefer opening the local app-shell entry
+- later, you do not need to remember a fixed trigger phrase; any intent like “open the shared library manager”, “open the local app version”, or “I cannot find the entry anymore” should be enough
 
 How to open the web version:
 
-- first run: `./scripts/build-shared-library-manager.sh`
-- then open: `manager/index.html` in your browser
+- right after the first install, you can simply choose the web version in that follow-up question
+- later, you can just ask the AI client to open the web version of the shared library manager again
 - the web version is enough for browsing and checking state
 - for local API actions such as changing the shared library location, prefer the client app version
 
@@ -352,3 +356,5 @@ This prompt is designed to avoid making the user hunt for local paths. Only if a
 - Do not install separate copies into every client folder
 - When you add another client, prefer the one-click client-onboarding prompt
 - If you already have an older batch of local skills, run one shared-library reconciliation pass after upgrading to `V1.3.1`
+- After installation, it is better for the AI client to ask one more time whether you want to open the local app version or the web version of the manager
+- Later, if you cannot find the entry point, you should only need to express the intent to reopen the manager rather than remember an exact keyword
