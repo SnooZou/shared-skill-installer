@@ -87,7 +87,7 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ---
 
-### 💬 安装完成后怎么调用
+### 💬 安装完成后怎么调用或安装新 Skill
 
 下面这些内容只适用于：`shared-skill-installer` 已经安装完成之后。
 
@@ -135,29 +135,6 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ```text
 请使用 $shared-skill-installer，验证这个共享 skill 是否已在所有配置客户端中生效。
-```
-
----
-
-### 📦 后续怎么安装新的 Skill
-
-装好 `shared-skill-installer` 之后，后续新增 skill 都走同一套规则：
-
-1. 先完整入库到共享库
-2. 再同步给所有本地智能体
-
-常见场景：
-
-- GitHub skill：发你自己的 GitHub skill 链接给智能体
-- 本地 skill：发你自己的本地路径给智能体
-- 多 skill 仓库：发你自己的仓库路径给智能体；容器名默认沿用仓库或文件夹名称，无需先写死
-
-命令行备用方式：
-
-```bash
-./scripts/run-install.sh --repo xxx/xxxx --path your-skill-path
-./scripts/run-install.sh --local /path/to/your-local-skill
-./scripts/run-install.sh --bundle-local /path/to/your-multi-skill-repo
 ```
 
 ---
@@ -263,7 +240,7 @@ After installation, restart Codex, WorkBuddy, TRAE, or any other local AI client
 
 ---
 
-### 💬 How To Invoke It After Installation
+### 💬 How To Invoke It Or Install New Skills After Installation
 
 Everything below assumes `shared-skill-installer` is already installed.
 
@@ -311,29 +288,6 @@ Verify that a shared skill is active:
 
 ```text
 Use $shared-skill-installer to verify whether this shared skill is active in every configured client.
-```
-
----
-
-### 📦 How To Add New Skills Later
-
-Once `shared-skill-installer` is installed, every new skill follows the same rule:
-
-1. Fully import it into the shared library
-2. Sync it to all local AI clients
-
-Common cases:
-
-- GitHub skill: send your own GitHub skill URL to the AI client
-- Local skill: send your own local folder path
-- Multi-skill repository: send your own repo path; the container name usually follows the repo or folder name by default
-
-Command-line fallback:
-
-```bash
-./scripts/run-install.sh --repo xxx/xxxx --path your-skill-path
-./scripts/run-install.sh --local /path/to/your-local-skill
-./scripts/run-install.sh --bundle-local /path/to/your-multi-skill-repo
 ```
 
 ---
