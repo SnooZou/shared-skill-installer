@@ -11,11 +11,11 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ## 中文说明
 
-### 🖥 Shared Library Manager
+### 🖥 Shared Skill Manager
 
-`Shared Library Manager` 是这次 `V1.3.1` 版本比较大的功能更新。它把原本偏抽象的共享 skill 机制，进一步做成了可直接查看、可直接进入的本地可视化管理界面。
+`Shared Skill Manager` 是这次 `V1.3.1` 版本比较大的功能更新。它把原本偏抽象的共享 skill 机制，进一步做成了可直接查看、可直接进入的本地可视化管理界面。
 
-![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
+![Shared Skill Manager](./docs/screenshots/manager-v131-overview.png)
 
 它主要用来查看：
 
@@ -27,11 +27,11 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 怎么打开客户端版：
 
-- macOS 首次安装后，会自动生成：`~/Applications/Shared Library Manager.app`
+- macOS 首次安装后，会自动生成：`~/Applications/Shared Skill Manager.app`
 - 后续直接像普通本地应用一样打开它即可
 - 第一次安装完成后，智能体应主动继续问你：现在要打开本地客户端版，还是网页版
 - 如果你选择客户端版，智能体应优先帮你打开本地壳应用入口
-- 如果你后续找不到入口，不需要记固定关键词，只要表达“帮我打开共享技能库管理台”“帮我打开客户端版”“我找不到入口了”这类意思即可
+- 如果你后续找不到入口，不需要记固定关键词，只要表达“帮我打开 Shared Skill Manager”“帮我打开共享技能库管理台”“帮我打开客户端版”“我找不到入口了”这类意思即可
 
 怎么打开网页版：
 
@@ -164,11 +164,11 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 
 ## English Guide
 
-### 🖥 Shared Library Manager
+### 🖥 Shared Skill Manager
 
-`Shared Library Manager` is one of the biggest updates in `V1.3.1`. It turns the shared skill workflow from something mostly abstract into a local visual dashboard that people can actually open and use.
+`Shared Skill Manager` is one of the biggest updates in `V1.3.1`. It turns the shared skill workflow from something mostly abstract into a local visual dashboard that people can actually open and use.
 
-![Shared Library Manager](./docs/screenshots/manager-v131-overview.png)
+![Shared Skill Manager](./docs/screenshots/manager-v131-overview.png)
 
 It is mainly for checking:
 
@@ -180,16 +180,16 @@ It is mainly for checking:
 
 How to open the client app version:
 
-- on macOS, the first install creates: `~/Applications/Shared Library Manager.app`
+- on macOS, the first install creates: `~/Applications/Shared Skill Manager.app`
 - after that, open it like a normal local app
 - right after the first install finishes, the AI client should actively ask whether you want to open the local app version or the web version
 - if you choose the local app version, the AI client should prefer opening the local app-shell entry
-- later, you do not need to remember a fixed trigger phrase; any intent like “open the shared library manager”, “open the local app version”, or “I cannot find the entry anymore” should be enough
+- later, you do not need to remember a fixed trigger phrase; any intent like “open the shared skill manager”, “open the local app version”, or “I cannot find the entry anymore” should be enough
 
 How to open the web version:
 
 - right after the first install, you can simply choose the web version in that follow-up question
-- later, you can just ask the AI client to open the web version of the shared library manager again
+- later, you can just ask the AI client to open the web version of the shared skill manager again
 - the web version is enough for browsing and checking state
 - for local API actions such as changing the shared library location, prefer the client app version
 

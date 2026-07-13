@@ -283,7 +283,7 @@ class SharedLibraryManagerHandler(SimpleHTTPRequestHandler):
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run the Shared Library Manager local server")
+    parser = argparse.ArgumentParser(description="Run the Shared Skill Manager local server")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--shared-root", help="Optional shared library root override")
@@ -297,7 +297,7 @@ def main() -> None:
     server = ThreadingHTTPServer((ns.host, ns.port), SharedLibraryManagerHandler)
     server.shared_root = shared_root  # type: ignore[attr-defined]
     url = f"http://{ns.host}:{ns.port}/"
-    print(f"Shared Library Manager running at {url}")
+    print(f"Shared Skill Manager running at {url}")
     print(f"Active shared root: {shared_root}")
 
     if ns.open_browser:

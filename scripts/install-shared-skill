@@ -430,12 +430,12 @@ build_manager_snapshot() {
   fi
 
   if [ "${DRY_RUN}" -eq 1 ]; then
-    log "Would rebuild Shared Library Manager data"
+    log "Would rebuild Shared Skill Manager data"
     return 0
   fi
 
   SHARED_ROOT="${SHARED_ROOT}" PACKAGE_ROOT="${PACKAGE_ROOT}" "${builder}" >/dev/null
-  log "Rebuilt Shared Library Manager data"
+  log "Rebuilt Shared Skill Manager data"
 }
 
 contains_skill_files() {

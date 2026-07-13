@@ -1,6 +1,6 @@
-# Shared Library Manager
+# Shared Skill Manager
 
-`Shared Library Manager` is now bundled into `shared-skill-installer V1.3.1`.
+`Shared Skill Manager` is now bundled into `shared-skill-installer V1.3.1`.
 
 It is the local visual dashboard for the shared skill library workflow.
 
@@ -62,7 +62,7 @@ On macOS, that command now prefers opening a faux local app shell:
 By default it builds:
 
 ```text
-~/Applications/Shared Library Manager.app
+~/Applications/Shared Skill Manager.app
 ```
 
 That shell app still renders the local web manager, but gives the user a stable “local app” entry point after the first install.

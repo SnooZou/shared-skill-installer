@@ -1,7 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 
-static NSString *const kAppTitle = @"Shared Library Manager";
+static NSString *const kAppTitle = @"Shared Skill Manager";
 static NSString *const kDefaultSharedRoot = @"~/AI-skills";
 static NSString *const kConfigPath = @"~/.shared-skill-installer/config.json";
 static NSString *const kHost = @"127.0.0.1";
@@ -26,7 +26,7 @@ static NSString *const kServerLogPath = @"/tmp/shared-library-manager-app.log";
   [self debugLog:[NSString stringWithFormat:@"shared root=%@", self.sharedRoot]];
   [self prepareWindow];
   [self stopExistingServerOnPort];
-  [self renderPlaceholderWithTitle:@"Loading Shared Library Manager"
+  [self renderPlaceholderWithTitle:@"Loading Shared Skill Manager"
                               body:@"Preparing your local shared-skill dashboard..."];
   [self startServerTask];
   [NSApp activateIgnoringOtherApps:YES];

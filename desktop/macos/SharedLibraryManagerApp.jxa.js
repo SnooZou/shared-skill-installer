@@ -3,7 +3,7 @@ ObjC.import('Foundation');
 ObjC.import('WebKit');
 ObjC.import('stdlib');
 
-const APP_TITLE = 'Shared Library Manager';
+const APP_TITLE = 'Shared Skill Manager';
 const DEFAULT_SHARED_ROOT = '~/AI-skills';
 const CONFIG_PATH = '~/.shared-skill-installer/config.json';
 const HOST = '127.0.0.1';
@@ -262,7 +262,7 @@ function boot() {
   $.NSURLCache.sharedURLCache.removeAllCachedResponses;
   stopExistingServerOnPort();
   renderPlaceholder(
-    'Loading Shared Library Manager',
+    'Loading Shared Skill Manager',
     'Preparing your local shared-skill dashboard...'
   );
   startServerTask();

@@ -7,7 +7,7 @@ VERSION_FILE="${ROOT}/VERSION"
 SOURCE_FILE="${ROOT}/desktop/macos/SharedLibraryManagerApp.m"
 ICON_SOURCE="${ROOT}/desktop/macos/assets/skill-manager-app-icon.png"
 BUILD_ROOT="${ROOT}/.build/macos-manager-app"
-APP_NAME="${APP_NAME:-Shared Library Manager}"
+APP_NAME="${APP_NAME:-Shared Skill Manager}"
 APP_SLUG="${APP_SLUG:-${APP_NAME}.app}"
 APP_DEST="${APP_DEST:-${HOME}/Applications/${APP_SLUG}}"
 EXECUTABLE_NAME="SharedLibraryManager"
@@ -20,10 +20,10 @@ usage() {
 Usage:
   build-shared-library-manager-app.sh [--open] [--print-path] [--quiet]
 
-Builds the macOS WebView shell app for Shared Library Manager.
+Builds the macOS WebView shell app for Shared Skill Manager.
 
 Environment overrides:
-  APP_DEST=/path/to/Shared Library Manager.app
+  APP_DEST=/path/to/Shared Skill Manager.app
 EOF
 }
 
@@ -52,7 +52,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ "$(uname -s)" != "Darwin" ]; then
-  echo "Shared Library Manager.app build is only supported on macOS." >&2
+  echo "Shared Skill Manager.app build is only supported on macOS." >&2
   exit 1
 fi
 
@@ -66,7 +66,7 @@ SYSTEM_VERSION="$(printf '%s' "${VERSION}" | sed 's/^[^0-9]*//')"
 if [ -z "${SYSTEM_VERSION}" ]; then
   SYSTEM_VERSION="1.0.0"
 fi
-APP_ID="com.snoozou.shared-library-manager"
+APP_ID="com.snoozou.shared-skill-manager"
 BUILD_APP="${BUILD_ROOT}/${APP_SLUG}"
 ICON_OUTPUT="${BUILD_ROOT}/skill-manager.icns"
 CLANG_BIN="$(xcrun --find clang)"
@@ -148,7 +148,7 @@ ditto "${BUILD_APP}" "${APP_DEST}"
 /usr/bin/xattr -dr com.apple.quarantine "${APP_DEST}" >/dev/null 2>&1 || true
 
 if [ "${QUIET}" -ne 1 ]; then
-  echo "Built Shared Library Manager app:"
+  echo "Built Shared Skill Manager app:"
   echo "${APP_DEST}"
 fi
 
