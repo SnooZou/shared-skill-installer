@@ -67,17 +67,6 @@ By default it builds:
 
 That shell app still renders the local web manager, but gives the user a stable “local app” entry point after the first install.
 
-## Why V1.3.1 matters
+## Release notes
 
-Before the `V1.3.0` local-app-shell update, users could lose track of how to reopen the manager after closing the browser window once.
-
-`V1.3.1` keeps the installer-level fixes and hardens the manager/app experience further:
-
-- `install-shared-skill --reconcile-library` can auto-adopt older local skill folders
-- missing client links can be repaired during the same reconciliation pass
-- the dashboard can now display indexed and unindexed entries more truthfully
-- multiline `SKILL.md` frontmatter descriptions no longer degrade into placeholder symbols such as `>` or `|`
-- the manager can now be reopened through a local app shell instead of relying on the user to remember a browser URL
-- browser mode and local app-shell mode now behave more consistently around manager-only actions such as shared-root relocation
-- official local client icon extraction was tightened so extracted app icons fill the avatar area more reliably
-- the macOS shell window defaults and minimum size were tuned to make compact usage less fragile
+Detailed version-by-version changes now live in [../CHANGELOG.md](../CHANGELOG.md).
