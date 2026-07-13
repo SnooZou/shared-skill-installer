@@ -23,9 +23,9 @@ let APP_STATE = null;
 
 const I18N = {
   zh: {
-    documentTitle: "共享技能库管理台",
+    documentTitle: "Skill Manager",
     brandEyebrow: "共享技能库",
-    brandTitle: "技能管理台",
+    brandTitleLines: ["Skill", "Manager"],
     brandSubtitle: "共享技能库可视化管理器",
     repoLinkLabel: "打开 GitHub 仓库",
     pageCrumb: "总览 / 共享技能库",
@@ -149,9 +149,9 @@ const I18N = {
     actionUnavailable: "不可用",
   },
   en: {
-    documentTitle: "Shared Library Manager",
+    documentTitle: "Skill Manager",
     brandEyebrow: "Shared Library",
-    brandTitle: "Skill Manager",
+    brandTitleLines: ["Skill", "Manager"],
     brandSubtitle: "Visual manager for your local shared skill library",
     repoLinkLabel: "Open GitHub repository",
     pageCrumb: "Overview / Shared Library",
@@ -407,17 +407,30 @@ function formatClientLabel(value) {
 }
 
 function iconTheme() {
+  if (UI_STATE.theme === "light") {
+    return `
+      <svg class="theme-icon theme-icon--sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.9" />
+        <path d="M12 2.75V5.1M12 18.9v2.35M21.25 12H18.9M5.1 12H2.75M18.54 5.46l-1.7 1.7M7.16 16.84l-1.7 1.7M18.54 18.54l-1.7-1.7M7.16 7.16l-1.7-1.7" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+      </svg>
+    `;
+  }
+
   return `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 15.2A7.5 7.5 0 0 1 8.8 4A8.8 8.8 0 1 0 20 15.2Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+    <svg class="theme-icon theme-icon--moon" viewBox="0 0 1024 1024" aria-hidden="true">
+      <path
+        d="M823.466667 716.8c-217.6 0-392.533333-174.933333-392.533334-392.533333 0-59.733333 12.8-115.2 34.133334-162.133334 12.8-34.133333-8.533333-72.533333-42.666667-64C230.4 136.533333 85.333333 307.2 85.333333 512c0 234.666667 192 426.666667 426.666667 426.666667 140.8 0 264.533333-68.266667 341.333333-170.666667 17.066667-21.333333-4.266667-51.2-29.866666-51.2zM512 853.333333c-187.733333 0-341.333333-153.6-341.333333-341.333333 0-132.266667 76.8-247.466667 187.733333-302.933333-12.8 34.133333-17.066667 72.533333-17.066667 115.2 0 226.133333 157.866667 418.133333 371.2 465.066666-55.466667 38.4-128 64-200.533333 64z"
+        fill="currentColor"
+      />
     </svg>
   `;
 }
 
 function iconLocale() {
   return `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 7h10M9 4c0 6-2.6 11.3-6 14M14 20l5-10l5 10M15.8 16.5h6.4M11.5 18c3.2-2.3 5.3-5.7 6.1-10" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+    <svg class="locale-icon" viewBox="0 0 1024 1024" aria-hidden="true">
+      <path d="M723.456 490.666667a42.666667 42.666667 0 0 1 39.637333 26.858666l137.216 343.893334a21.333333 21.333333 0 0 1-19.818666 29.226666h-41.386667a21.333333 21.333333 0 0 1-19.925333-13.696l-29.546667-77.162666h-159.36l-27.797333 76.8a21.333333 21.333333 0 0 1-20.053334 14.08h-39.253333a21.333333 21.333333 0 0 1-19.904-29.056l133.44-343.701334A42.666667 42.666667 0 0 1 696.469333 490.666667h26.986667z m-68.458667 241.749333h108.8l-54.933333-148.416v-0.042667l-53.866667 148.48zM296.810667 106.88c34.453333 0 41.685333 21.589333 41.685333 39.722667v37.525333h98.005333c52.181333 0 75.477333 24.192 75.477334 78.293333v111.573334c0 54.506667-23.36 78.826667-75.477334 78.826666h-97.92V546.133333c1.408 20.736-13.568 38.784-33.429333 40.277334-2.133333 0.170667-4.309333 0.106667-6.442667-0.128-19.754667 2.773333-37.930667-11.669333-40.618666-32.277334a39.168 39.168 0 0 1-0.234667-7.936v-93.333333h-97.066667C108.608 452.757333 85.333333 428.373333 85.333333 373.952V262.4C85.333333 208.213333 108.693333 184.064 160.789333 184.064h97.066667V146.581333c-1.6-20.330667 12.928-38.144 32.384-39.808a36.053333 36.053333 0 0 1 6.570667 0.106667z m-123.690667 156.629333c-7.338667 0-8 0.725333-8 8.405334v92.949333c0 7.722667 0.661333 8.469333 8 8.469333h84.736v-109.824H173.12z m165.44-0.021333v109.824h85.738667c7.146667 0 8.064-0.96 8.064-8.384v-93.013333c0-7.466667-0.917333-8.426667-8.064-8.426667H338.56z" fill="currentColor"></path>
+      <path d="M170.666667 640a42.666667 42.666667 0 0 1 42.666666 42.666667v42.666666a85.333333 85.333333 0 0 0 78.933334 85.12l6.4 0.213334h85.333333a42.666667 42.666667 0 0 1 0 85.333333h-85.333333a170.688 170.688 0 0 1-170.666667-170.666667v-42.666666a42.666667 42.666667 0 0 1 42.666667-42.666667zM725.333333 128a170.666667 170.666667 0 0 1 170.666667 170.666667v42.666666a42.666667 42.666667 0 0 1-85.333333 0v-42.666666a85.397333 85.397333 0 0 0-85.333334-85.333334h-85.333333a42.666667 42.666667 0 0 1 0-85.333333h85.333333z" fill="currentColor" opacity="0.88"></path>
     </svg>
   `;
 }
@@ -551,7 +564,9 @@ function syncSelectedContainer(containers) {
 
 function renderStaticTexts() {
   document.getElementById("brand-eyebrow").textContent = t("brandEyebrow");
-  document.getElementById("brand-title").textContent = t("brandTitle");
+  document.getElementById("brand-title").innerHTML = (t("brandTitleLines") || [])
+    .map((line) => `<span class="sidebar__title-line">${escapeHtml(line)}</span>`)
+    .join("");
   document.getElementById("brand-subtitle").textContent = t("brandSubtitle");
   document.getElementById("page-crumb").textContent = t("pageCrumb");
   document.getElementById("page-title").textContent = t("pageTitle");

@@ -121,45 +121,59 @@ p {
 }
 
 .sidebar__brand {
-  padding: 4px 10px 0;
+  padding: 4px 8px 0;
 }
 
 .sidebar__title-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
-  margin-top: 10px;
+  column-gap: 12px;
+  margin-top: 0;
   min-width: 0;
+  width: 100%;
 }
 
 .sidebar__brandmark {
-  width: 30px;
-  height: 30px;
+  width: 44px;
+  height: 44px;
   display: block;
   flex: none;
-  border-radius: 8px;
-  box-shadow: 0 10px 24px rgba(38, 71, 198, 0.22);
+  border-radius: 0;
+  object-fit: contain;
+  object-position: center;
+  box-shadow: none;
+  filter: drop-shadow(0 10px 20px rgba(38, 71, 198, 0.14));
 }
 
 .sidebar__eyebrow {
-  color: var(--accent);
-  font-size: 12px;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  display: none;
 }
 
 .sidebar__title {
-  font-size: 28px;
-  line-height: 1.04;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  max-width: 132px;
+  font-size: 24px;
+  line-height: 0.94;
   letter-spacing: -0.03em;
   margin: 0;
 }
 
+.sidebar__title-line {
+  display: block;
+  white-space: nowrap;
+}
+
 .sidebar__subtitle {
-  margin-top: 10px;
+  margin-top: 12px;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.5;
+  max-width: 100%;
 }
 
 .sidebar__brandbar {
@@ -311,7 +325,7 @@ p {
 
 .app-main {
   min-width: 0;
-  padding: 28px 28px 36px;
+  padding: 20px 28px 36px;
 }
 
 .page-header {
@@ -319,7 +333,7 @@ p {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
   gap: 24px 22px;
-  padding: 6px 6px 0;
+  padding: 2px 6px 0;
 }
 
 .page-header__copy {
@@ -327,14 +341,14 @@ p {
   display: grid;
   align-content: start;
   gap: 0;
-  padding-top: 8px;
+  padding-top: 2px;
 }
 
 .page-header__controls {
   grid-column: 9 / -1;
   justify-self: end;
   align-self: start;
-  padding-top: 8px;
+  padding-top: 2px;
 }
 
 .toolbar-controls {
@@ -348,6 +362,7 @@ p {
 .icon-toggle {
   width: 42px;
   height: 42px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -366,9 +381,29 @@ p {
 }
 
 .icon-toggle svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: block;
+  margin: auto;
+  flex: none;
+  aspect-ratio: 1 / 1;
+  overflow: visible;
+  transform-origin: center;
+}
+
+.theme-icon--moon {
+  width: 24px;
+  height: 24px;
+}
+
+.theme-icon--sun {
+  width: 24px;
+  height: 24px;
+}
+
+.locale-icon {
+  width: 24px;
+  height: 24px;
 }
 
 .icon-toggle.is-light,
