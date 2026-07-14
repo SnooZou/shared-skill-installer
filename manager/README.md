@@ -65,6 +65,8 @@ By default it builds:
 ~/Applications/Shared Skill Manager.app
 ```
 
+If the target Mac does not have Apple developer tools or `clang`, the installer now falls back to an `osacompile + JXA` app-shell build so the local client entry can still be created.
+
 That shell app still renders the local web manager, but gives the user a stable “local app” entry point after the first install.
 
 ## Release notes

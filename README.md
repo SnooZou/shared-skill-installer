@@ -28,6 +28,7 @@ Detailed release notes: [CHANGELOG.md](./CHANGELOG.md)
 怎么打开客户端版：
 
 - macOS 首次安装后，会自动生成：`~/Applications/Shared Skill Manager.app`
+- 即使目标 Mac 没装 Apple 开发者工具或 `clang`，安装流程现在也会自动回退到无需编译器的本地客户端打包方式
 - 后续直接像普通本地应用一样打开它即可
 - 第一次安装完成后，智能体应主动继续问你：现在要打开本地客户端版，还是网页版
 - 如果你选择客户端版，智能体应优先帮你打开本地壳应用入口
@@ -181,6 +182,7 @@ It is mainly for checking:
 How to open the client app version:
 
 - on macOS, the first install creates: `~/Applications/Shared Skill Manager.app`
+- even when the target Mac does not have Apple developer tools or `clang`, the installer now falls back to a no-compiler local app packaging path
 - after that, open it like a normal local app
 - right after the first install finishes, the AI client should actively ask whether you want to open the local app version or the web version
 - if you choose the local app version, the AI client should prefer opening the local app-shell entry

@@ -19,6 +19,7 @@ README stays focused on installation, usage, and the manager UI. This file keeps
 - 管理台会优先从本机已安装客户端的官方应用包里提取图标并本地引用，后续新增 Cursor、Claude 等客户端也沿用这套机制
 - 修复 `SKILL.md` 多行 frontmatter 描述被错误显示为 `>` 或 `|` 的问题，技能介绍读取更稳定
 - macOS 首次安装后会自动生成 `Shared Skill Manager.app`，用户以后可以像打开本地应用一样重新进入管理台
+- 即使目标 Mac 没有安装 Apple 开发者工具 / `clang`，现在也会自动回退到 `osacompile + JXA` 本地壳应用打包链路，不再因为缺少编译器而失去客户端入口
 - 管理台脚本现在会优先打开这个本地壳应用，找不到时再回退到浏览器模式
 - 浏览器静态页与本地客户端壳的能力边界已明确区分：像“更改共享库位置”这类动作只在具备本地 API 的模式里显示
 - 管理台顶部交互、图标提取、客户端重开流程和本地壳应用打包链路做了进一步收口，减少“功能修好了但入口状态不一致”的情况
@@ -52,6 +53,7 @@ README stays focused on installation, usage, and the manager UI. This file keeps
 - Official local client icon extraction is now used preferentially when matching installed app bundles are found
 - Multiline `SKILL.md` frontmatter descriptions no longer degrade into placeholder symbols such as `>` or `|`
 - On macOS, first install can automatically build `Shared Skill Manager.app` as a stable local entry point
+- Even when a target Mac does not have Apple developer tools or `clang`, the installer now falls back to an `osacompile + JXA` app-shell build instead of dropping the local client entry entirely
 - The manager launcher now prefers opening the local app shell and only falls back to browser mode when the shell is unavailable
 - Static browser mode and local app-shell mode now expose the right actions more consistently, including manager-only capabilities such as shared-root relocation
 - The manager header flow, icon extraction path, client reopen path, and local shell packaging chain were tightened to reduce mismatched entry-state issues
