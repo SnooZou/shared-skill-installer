@@ -23,6 +23,7 @@ EXPORT_SCRIPT = ROOT / "scripts" / "export-shared-library-state.py"
 BUILD_SCRIPT = ROOT / "scripts" / "build-shared-library-manager.sh"
 RELOCATE_SCRIPT = ROOT / "scripts" / "relocate-shared-library.py"
 CLIENT_ICON_MANIFEST = MANAGER_DIR / "data" / "client-icons.js"
+STATE_BUILD_LOCK = threading.RLock()
 
 
 def run(cmd: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
@@ -44,30 +45,31 @@ def configured_shared_root() -> Path:
 
 
 def build_state_payload(shared_root: Path) -> dict:
-    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as fh:
-        tmp_path = Path(fh.name)
-    try:
-        proc = run(
-            [
-                sys.executable,
-                str(EXPORT_SCRIPT),
-                "--shared-root",
-                str(shared_root),
-                "--package-root",
-                str(ROOT),
-                "--output",
-                str(tmp_path),
-                "--format",
-                "json",
-            ]
-        )
-        if proc.returncode != 0:
-            raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "Failed to export library state")
-        payload = json.loads(tmp_path.read_text())
-        payload["client_icons"] = read_client_icons()
-        return payload
-    finally:
-        tmp_path.unlink(missing_ok=True)
+    with STATE_BUILD_LOCK:
+        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as fh:
+            tmp_path = Path(fh.name)
+        try:
+            proc = run(
+                [
+                    sys.executable,
+                    str(EXPORT_SCRIPT),
+                    "--shared-root",
+                    str(shared_root),
+                    "--package-root",
+                    str(ROOT),
+                    "--output",
+                    str(tmp_path),
+                    "--format",
+                    "json",
+                ]
+            )
+            if proc.returncode != 0:
+                raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "Failed to export library state")
+            payload = json.loads(tmp_path.read_text())
+            payload["client_icons"] = read_client_icons()
+            return payload
+        finally:
+            tmp_path.unlink(missing_ok=True)
 
 
 def read_client_icons() -> dict:
@@ -87,12 +89,13 @@ def read_client_icons() -> dict:
 
 
 def refresh_bundled_assets(shared_root: Path) -> dict:
-    env = os.environ.copy()
-    env["SHARED_ROOT"] = str(shared_root)
-    proc = run([str(BUILD_SCRIPT)], env=env)
-    if proc.returncode != 0:
-        raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "Failed to rebuild manager data")
-    return build_state_payload(shared_root)
+    with STATE_BUILD_LOCK:
+        env = os.environ.copy()
+        env["SHARED_ROOT"] = str(shared_root)
+        proc = run([str(BUILD_SCRIPT)], env=env)
+        if proc.returncode != 0:
+            raise RuntimeError(proc.stderr.strip() or proc.stdout.strip() or "Failed to rebuild manager data")
+        return build_state_payload(shared_root)
 
 
 def normalize_openable_path(raw: str) -> Path:

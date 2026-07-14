@@ -298,7 +298,7 @@ def main() -> None:
 
     output_dir.mkdir(parents=True, exist_ok=True)
     for stale in output_dir.glob("*.png"):
-        stale.unlink()
+        stale.unlink(missing_ok=True)
 
     entries: dict[str, dict[str, str]] = {}
     for label in read_client_labels(shared_root):
